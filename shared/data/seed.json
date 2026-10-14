@@ -1,0 +1,218 @@
+{
+  "site": {
+    "name": "LL Imports CWB",
+    "tagline": "iPhone, iPad, MacBook e Apple Watch em Curitiba",
+    "whatsapp": "554132275066",
+    "whatsappDisplay": "(41) 3227-5066",
+    "email": "llimportscwb@gmail.com",
+    "instagram": "llimportscwb",
+    "followers": "12,2 mil",
+    "yearsInMarket": "4 anos",
+    "clientsServed": "+2.000 clientes",
+    "isVerified": true,
+    "address": {
+      "street": "Rua Anita Garibaldi, 850",
+      "complement": "Sala 401 · Torre C",
+      "district": "Cabral",
+      "city": "Curitiba",
+      "state": "PR"
+    },
+    "cnpj": "51.128.849/0001-86",
+    "googleRating": 4.9,
+    "hours": "Segunda a Sexta: 09h às 19h · Sábado: 09h às 14h (Atendimento com hora marcada)"
+  },
+
+  "nav": [
+    { "label": "Catálogo", "href": "#catalogo" },
+    { "label": "Destaque", "href": "#destaque" },
+    { "label": "Experiência", "href": "#experiencia" },
+    { "label": "Avaliações", "href": "#avaliacoes" },
+    { "label": "Contato", "href": "#contato" }
+  ],
+
+  "sections": [
+    {
+      "key": "hero",
+      "visible": true,
+      "position": 1,
+      "content": {
+        "badge": "Linha iPhone 17 disponível no showroom",
+        "titleBefore": "O",
+        "rotatingWords": ["iPhone", "MacBook", "iPad", "Apple Watch"],
+        "titleAfter": "dos seus sonhos,",
+        "titleMuted": "com a exclusividade que você merece.",
+        "subtitle": "Lançamentos Apple, novos e seminovos, com atendimento personalizado, segurança e as melhores condições de Curitiba.",
+        "primaryCta": {
+          "label": "Falar com especialista",
+          "message": "Olá! Vim pelo site da LL Imports e gostaria de falar com um especialista."
+        },
+        "secondaryCta": {
+          "label": "Agendar visita",
+          "message": "Olá! Gostaria de agendar um horário exclusivo no showroom da LL Imports."
+        },
+        "stageChip": "Entrega em mãos no showroom"
+      }
+    },
+    {
+      "key": "marquee",
+      "visible": true,
+      "position": 2,
+      "content": {
+        "items": [
+          "Produtos 100% originais",
+          "Nota fiscal (NF-e)",
+          "Lacrados e seminovos selecionados",
+          "Showroom exclusivo no Cabral",
+          "4,9 estrelas no Google",
+          "12,2 mil seguidores no Instagram",
+          "Mais de 2.000 clientes atendidos",
+          "Pós-venda de verdade"
+        ]
+      }
+    },
+    {
+      "key": "flagship",
+      "visible": true,
+      "position": 3,
+      "content": {
+        "tag": "Edição de Destaque",
+        "title": "iPhone 17 Pro Max.",
+        "subtitle": "Titânio aeroespacial e o sistema de câmeras mais avançado já criado pela Apple. Pronto para retirada em mãos em Curitiba.",
+        "specs": [
+          { "val": "Tela 6.9″", "label": "Super Retina XDR com ProMotion e até 3000 nits" },
+          { "val": "48 MP Fusion", "label": "Sistema Pro com zoom óptico de 8x (200mm)" },
+          { "val": "Chip A18 Pro", "label": "GPU de 6 núcleos e suporte a Ray Tracing acelerado" },
+          { "val": "4.823 mAh", "label": "Bateria de longa duração com recarga ultrarrápida" }
+        ],
+        "cta": "Consultar Disponibilidade do 17 Pro Max"
+      }
+    },
+    {
+      "key": "experience",
+      "visible": true,
+      "position": 4,
+      "content": {
+        "tag": "Autoridade & Confiança",
+        "title": "Por que a LL Imports é a escolha número 1 em Curitiba",
+        "subtitle": "Uma experiência de showroom pensada para quem valoriza tempo, discrição e segurança absoluta.",
+        "metrics": [
+          { "num": "4+", "label": "Anos de mercado em Curitiba" },
+          { "num": "+2.000", "label": "Clientes atendidos e satisfeitos" },
+          { "num": "4.9 ★", "label": "Avaliação média no Google Reviews" },
+          { "num": "100%", "label": "Originais com garantia oficial" }
+        ],
+        "pillars": [
+          {
+            "icon": "shield",
+            "title": "Atendimento com Hora Marcada",
+            "desc": "Agende seu horário exclusivo na Torre C do Cabral. Espaço reservado, consultor dedicado e total privacidade."
+          },
+          {
+            "icon": "lock",
+            "title": "Segurança e Pagamento na Entrega",
+            "desc": "Conferência minuciosa na sua frente: consulte número de série, estado do lacre e pague somente ao receber o aparelho."
+          },
+          {
+            "icon": "check",
+            "title": "Garantia Real e Transparência",
+            "desc": "Aparelhos lacrados com 1 ano oficial Apple. Seminovos criteriosamente revisados com bateria íntegra e garantia da loja."
+          }
+        ]
+      }
+    },
+    {
+      "key": "reviews",
+      "visible": true,
+      "position": 5,
+      "content": {
+        "tag": "Opinião de Quem Comprou",
+        "title": "A confiança refletida em cada entrega",
+        "subtitle": "Veja avaliações verificadas de clientes que escolheram a LL Imports CWB.",
+        "items": [
+          {
+            "name": "Isaias Garcez",
+            "badge": "Local Guide Google",
+            "stars": 5,
+            "text": "Muito bem atendido via Instagram, agendamento pra ver o aparelho foi bem rápido. iPhone 13 PRO em excelente estado com Garantia de 1 ano, atendimento na loja excelente, testam tudo mesmo na sua frente. Ainda ganhei uma incrível embalagem de presente feita por eles. Vou voltar e indicar com certeza."
+          },
+          {
+            "name": "Rita Pacheco",
+            "badge": "Local Guide Google",
+            "stars": 5,
+            "text": "Fui até a loja por indicação de duas amigas e não me arrependi! Atendimento personalizado e encontramos o modelo de celular perfeito funcionando bem! Oferecem acessórios também! Recomendo!"
+          },
+          {
+            "name": "Lucas K.",
+            "badge": "Cliente Verificado",
+            "stars": 5,
+            "text": "Comprei um MacBook Air M4 e o atendimento superou qualquer loja oficial. Preço muito mais justo, peguei em mãos na sala no Cabral no mesmo dia. Nota 10!"
+          }
+        ]
+      }
+    },
+    {
+      "key": "faq",
+      "visible": true,
+      "position": 6,
+      "content": {
+        "tag": "Dúvidas Frequentes",
+        "title": "Tudo o que você precisa saber",
+        "items": [
+          {
+            "q": "Os aparelhos são originais e têm garantia Apple?",
+            "a": "Sim. Todos os produtos lacrados têm garantia mundial oficial de 1 ano pela Apple, aceita em qualquer assistência autorizada. Os seminovos possuem garantia direta com a LL Imports."
+          },
+          {
+            "q": "Como funciona o atendimento presencial no Cabral?",
+            "a": "Nosso showroom fica no Edifício Anita Garibaldi, Torre C, Sala 401. Para oferecer segurança e privacidade total, atendemos com agendamento prévio no WhatsApp."
+          },
+          {
+            "q": "Posso dar o meu iPhone usado na troca (Trade-in)?",
+            "a": "Sim! Avaliamos o seu aparelho usado no ato e abatemos o valor diretamente no novo modelo. O saldo restante pode ser pago via Pix ou parcelado no cartão."
+          },
+          {
+            "q": "Quais as formas de pagamento aceitas?",
+            "a": "Aceitamos pagamento via Pix com desconto exclusivo à vista ou cartão de crédito em até 18x com as melhores taxas de Curitiba."
+          }
+        ]
+      }
+    }
+  ],
+
+  "categories": [
+    { "key": "iphone", "label": "iPhone" },
+    { "key": "ipad", "label": "iPad" },
+    { "key": "macbook", "label": "MacBook" },
+    { "key": "macmini", "label": "Mac mini" },
+    { "key": "watch", "label": "Apple Watch" },
+    { "key": "acessorios", "label": "Acessórios" }
+  ],
+
+  "products": [
+    { "id": "ip17pm", "name": "iPhone 17 Pro Max", "category": "iphone", "condition": "novo", "price": 7599, "storage": ["256GB", "512GB", "1TB", "2TB"], "colors": ["Laranja Cósmico", "Azul Profundo", "Prata"], "badge": "Lançamento", "warranty": "1 ano Apple", "featured": true, "active": true, "position": 1 },
+    { "id": "ip17p", "name": "iPhone 17 Pro", "category": "iphone", "condition": "novo", "price": 7199, "storage": ["256GB", "512GB", "1TB"], "colors": ["Laranja Cósmico", "Azul Profundo", "Prata"], "badge": "Lançamento", "warranty": "1 ano Apple", "featured": false, "active": true, "position": 2 },
+    { "id": "ipair", "name": "iPhone Air", "category": "iphone", "condition": "novo", "price": 5799, "storage": ["256GB", "512GB", "1TB"], "colors": ["Preto Espacial", "Branco Nuvem", "Dourado Claro", "Azul Céu"], "badge": "Lacrado", "warranty": "1 ano Apple", "featured": false, "active": true, "position": 3 },
+    { "id": "ip17", "name": "iPhone 17", "category": "iphone", "condition": "novo", "price": 5599, "storage": ["256GB", "512GB"], "colors": ["Preto", "Branco", "Lavanda", "Sálvia", "Azul Névoa"], "badge": "Lacrado", "warranty": "1 ano Apple", "featured": false, "active": true, "position": 4 },
+    { "id": "ip16pm-s", "name": "iPhone 16 Pro Max", "category": "iphone", "condition": "seminovo", "price": null, "storage": ["256GB", "512GB"], "colors": ["Titânio Natural", "Titânio Deserto", "Titânio Preto"], "badge": "Seminovo selecionado", "warranty": "Garantia da loja", "featured": false, "active": true, "position": 5 },
+    { "id": "ip15pro-s", "name": "iPhone 15 Pro", "category": "iphone", "condition": "seminovo", "price": null, "storage": ["128GB", "256GB"], "colors": ["Titânio Natural", "Titânio Azul"], "badge": "Seminovo selecionado", "warranty": "Garantia da loja", "featured": false, "active": true, "position": 6 },
+    { "id": "ip13pro-s", "name": "iPhone 13 Pro", "category": "iphone", "condition": "seminovo", "price": null, "storage": ["128GB", "256GB"], "colors": ["Grafite", "Azul-Sierra"], "badge": "Seminovo selecionado", "warranty": "Garantia da loja", "featured": false, "active": true, "position": 7 },
+
+    { "id": "ipadpro", "name": "iPad Pro", "category": "ipad", "condition": "novo", "price": null, "storage": ["256GB", "512GB", "1TB"], "colors": ["Preto Espacial", "Prateado"], "badge": "Lacrado", "warranty": "1 ano Apple", "featured": false, "active": true, "position": 1 },
+    { "id": "ipadair", "name": "iPad Air", "category": "ipad", "condition": "novo", "price": null, "storage": ["128GB", "256GB"], "colors": ["Cinza Espacial", "Azul", "Roxo", "Estelar"], "badge": "Lacrado", "warranty": "1 ano Apple", "featured": false, "active": true, "position": 2 },
+    { "id": "ipadmini", "name": "iPad mini", "category": "ipad", "condition": "novo", "price": null, "storage": ["128GB", "256GB"], "colors": ["Cinza Espacial", "Azul", "Roxo", "Estelar"], "badge": "Lacrado", "warranty": "1 ano Apple", "featured": false, "active": true, "position": 3 },
+
+    { "id": "mba13m4", "name": "MacBook Air 13″ M4", "category": "macbook", "condition": "novo", "price": 9999, "storage": ["16GB · 256GB", "16GB · 512GB"], "colors": ["Meia-noite", "Estelar", "Azul-céu", "Prateado"], "badge": "Promoção", "warranty": "1 ano Apple", "featured": false, "active": true, "position": 1 },
+    { "id": "mba15m4", "name": "MacBook Air 15″ M4", "category": "macbook", "condition": "novo", "price": null, "storage": ["16GB · 256GB", "16GB · 512GB"], "colors": ["Meia-noite", "Estelar", "Azul-céu", "Prateado"], "badge": "Lacrado", "warranty": "1 ano Apple", "featured": false, "active": true, "position": 2 },
+    { "id": "mbp14", "name": "MacBook Pro 14″", "category": "macbook", "condition": "novo", "price": null, "storage": ["16GB · 512GB", "24GB · 1TB"], "colors": ["Preto Espacial", "Prateado"], "badge": "Lacrado", "warranty": "1 ano Apple", "featured": false, "active": true, "position": 3 },
+
+    { "id": "macmini", "name": "Mac mini M4", "category": "macmini", "condition": "novo", "price": null, "storage": ["16GB · 256GB", "16GB · 512GB"], "colors": ["Prateado"], "badge": "Lacrado", "warranty": "1 ano Apple", "featured": false, "active": true, "position": 1 },
+
+    { "id": "watchultra", "name": "Apple Watch Ultra", "category": "watch", "condition": "novo", "price": null, "storage": ["49 mm"], "colors": ["Titânio Natural", "Titânio Preto"], "badge": "Lacrado", "warranty": "1 ano Apple", "featured": false, "active": true, "position": 1 },
+    { "id": "watchs", "name": "Apple Watch Series", "category": "watch", "condition": "novo", "price": null, "storage": ["42 mm", "46 mm"], "colors": ["Preto Brilhante", "Prateado", "Ouro Rosa"], "badge": "Lacrado", "warranty": "1 ano Apple", "featured": false, "active": true, "position": 2 },
+    { "id": "watchse", "name": "Apple Watch SE", "category": "watch", "condition": "novo", "price": null, "storage": ["40 mm", "44 mm"], "colors": ["Meia-noite", "Estelar"], "badge": "Lacrado", "warranty": "1 ano Apple", "featured": false, "active": true, "position": 3 },
+
+    { "id": "airpodspro", "name": "AirPods Pro", "category": "acessorios", "condition": "novo", "price": null, "storage": [], "colors": ["Branco"], "badge": "Lacrado", "warranty": "1 ano Apple", "featured": false, "active": true, "position": 1 },
+    { "id": "airpods4", "name": "AirPods 4", "category": "acessorios", "condition": "novo", "price": null, "storage": [], "colors": ["Branco"], "badge": "Lacrado", "warranty": "1 ano Apple", "featured": false, "active": true, "position": 2 },
+    { "id": "magsafe", "name": "Capas e carregadores MagSafe", "category": "acessorios", "condition": "novo", "price": null, "storage": [], "colors": [], "badge": "Originais", "warranty": "Garantia do fabricante", "featured": false, "active": true, "position": 3 }
+  ]
+}

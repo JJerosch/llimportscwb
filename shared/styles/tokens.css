@@ -1,0 +1,81 @@
+/* ==========================================================================
+   LL Imports CWB — Design tokens
+   Paleta monocromática derivada da logo (branco/prata sobre preto).
+   Compartilhado pelas versões React e Vue.
+   ========================================================================== */
+
+:root {
+  /* Superfícies */
+  --bg-0: #030303;
+  --bg-1: #08080a;
+  --bg-2: #0f0f11;
+  --bg-3: #161618;
+  --surface: rgba(255, 255, 255, 0.035);
+  --surface-2: rgba(255, 255, 255, 0.06);
+  --surface-3: rgba(255, 255, 255, 0.09);
+  --glass: rgba(14, 14, 16, 0.58);
+  --glass-strong: rgba(10, 10, 12, 0.82);
+
+  /* Bordas */
+  --border: rgba(255, 255, 255, 0.08);
+  --border-2: rgba(255, 255, 255, 0.14);
+  --border-3: rgba(255, 255, 255, 0.24);
+
+  /* Texto */
+  --text-0: #f7f7f7;
+  --text-1: #c4c4c6;
+  --text-2: #8b8b90;
+  --text-3: #5d5d62;
+
+  /* Prata / metal (identidade) */
+  --silver-0: #ffffff;
+  --silver-1: #e6e6e6;
+  --silver-2: #bfbfbf;
+  --silver-3: #8c8c8c;
+  --silver-4: #686868;
+  --graphite: #424242;
+
+  --grad-silver-text: linear-gradient(180deg, #ffffff 0%, #e2e2e2 40%, #9a9a9a 100%);
+  --grad-metal: linear-gradient(135deg, #fafafa 0%, #c9c9c9 28%, #8e8e8e 52%, #dcdcdc 76%, #a4a4a4 100%);
+  --grad-border: linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.04) 60%);
+
+  /* Status */
+  --live: #5ee08f;
+  --star: #f5c451;
+
+  /* Tipografia */
+  --font-display: 'Montserrat', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.875rem;
+  --fs-md: 1rem;
+  --fs-lg: 1.125rem;
+  --fs-xl: 1.375rem;
+  --fs-display: clamp(2.5rem, 6.2vw, 5.4rem);
+
+  /* Layout */
+  --container: 1200px;
+  --gutter: clamp(1rem, 4vw, 2rem);
+  --header-h: 64px;
+
+  /* Raios */
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 24px;
+  --r-xl: 32px;
+  --r-pill: 999px;
+
+  /* Sombras */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 10px 30px -10px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 40px 80px -30px rgba(0, 0, 0, 0.85);
+  --glow-silver: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 10px 40px -12px rgba(255, 255, 255, 0.25);
+
+  /* Movimento */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 180ms;
+  --dur: 320ms;
+  --dur-slow: 700ms;
+}
