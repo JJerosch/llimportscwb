@@ -1614,6 +1614,238 @@
   color: var(--text-2);
 }
 
+/* --------------------------------------------------------------------------
+   Mecânicas de Unidades (Bateria & Grau Estético) no Catálogo
+   -------------------------------------------------------------------------- */
+.product-card__meta-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.grade-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--r-pill);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-2);
+  color: var(--silver-1);
+}
+
+.grade-badge--novo {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: var(--silver-0);
+}
+
+.grade-badge--excelente {
+  background: rgba(94, 224, 143, 0.08);
+  border-color: rgba(94, 224, 143, 0.25);
+  color: var(--live);
+}
+
+.grade-badge--muito_bom {
+  background: rgba(147, 197, 253, 0.08);
+  border-color: rgba(147, 197, 253, 0.25);
+  color: #93c5fd;
+}
+
+.grade-badge--bom_usado {
+  background: rgba(251, 191, 36, 0.08);
+  border-color: rgba(251, 191, 36, 0.25);
+  color: #fbbf24;
+}
+
+.battery-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--r-pill);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  color: var(--text-1);
+}
+
+.battery-badge--good {
+  color: var(--live);
+  border-color: rgba(94, 224, 143, 0.25);
+  background: rgba(94, 224, 143, 0.08);
+}
+
+.battery-badge--medium {
+  color: #93c5fd;
+  border-color: rgba(147, 197, 253, 0.25);
+  background: rgba(147, 197, 253, 0.08);
+}
+
+.product-card__units-box {
+  margin-top: 0.85rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: var(--bg-0);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+}
+
+.product-card__units-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.6875rem;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.unit-chips {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.unit-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.45rem 0.65rem;
+  border-radius: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-1);
+  font-size: 0.75rem;
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--dur) var(--ease-out);
+}
+
+.unit-chip:hover {
+  background: var(--surface-2);
+  border-color: var(--border-2);
+  color: var(--text-0);
+}
+
+.unit-chip.is-active {
+  background: var(--surface-3);
+  border-color: var(--silver-2);
+  color: var(--text-0);
+  box-shadow: 0 0 10px -2px rgba(255, 255, 255, 0.15);
+}
+
+.unit-chip__main {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.unit-chip__name {
+  font-weight: 500;
+  color: var(--text-0);
+}
+
+.unit-chip__sub {
+  font-size: 0.6875rem;
+  color: var(--text-2);
+}
+
+.unit-chip__price {
+  font-weight: 600;
+  color: var(--silver-1);
+  font-size: 0.75rem;
+}
+
+/* --------------------------------------------------------------------------
+   Abas e Controles Avançados do Painel do Admin
+   -------------------------------------------------------------------------- */
+.admin-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-1);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  padding: 0 1.5rem;
+  gap: 0.25rem;
+  overflow-x: auto;
+}
+
+.admin-tab-btn {
+  padding: 0.85rem 0.75rem;
+  border: none;
+  background: none;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-2);
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--dur) var(--ease-out);
+}
+
+.admin-tab-btn:hover {
+  color: var(--text-0);
+}
+
+.admin-tab-btn.is-active {
+  color: var(--silver-0);
+  border-bottom-color: var(--silver-1);
+}
+
+.admin-badge {
+  display: inline-block;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+}
+
+.admin-badge--active {
+  background: rgba(94, 224, 143, 0.15);
+  color: var(--live);
+  border: 1px solid rgba(94, 224, 143, 0.3);
+}
+
+.admin-badge--inactive {
+  background: rgba(255, 107, 107, 0.15);
+  color: #ff6b6b;
+  border: 1px solid rgba(255, 107, 107, 0.3);
+}
+
+.admin-badge--sold {
+  background: rgba(148, 163, 184, 0.15);
+  color: #94a3b8;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.admin-unit-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.85rem;
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  margin-bottom: 0.5rem;
+}
+
+.admin-unit-item__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
 @keyframes slide-in {
   from { transform: translateX(100%); }
   to { transform: translateX(0); }

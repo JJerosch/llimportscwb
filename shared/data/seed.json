@@ -189,30 +189,269 @@
   ],
 
   "products": [
-    { "id": "ip17pm", "name": "iPhone 17 Pro Max", "category": "iphone", "condition": "novo", "price": 7599, "storage": ["256GB", "512GB", "1TB", "2TB"], "colors": ["Laranja Cósmico", "Azul Profundo", "Prata"], "badge": "Lançamento", "warranty": "1 ano Apple", "featured": true, "active": true, "position": 1 },
-    { "id": "ip17p", "name": "iPhone 17 Pro", "category": "iphone", "condition": "novo", "price": 7199, "storage": ["256GB", "512GB", "1TB"], "colors": ["Laranja Cósmico", "Azul Profundo", "Prata"], "badge": "Lançamento", "warranty": "1 ano Apple", "featured": false, "active": true, "position": 2 },
-    { "id": "ipair", "name": "iPhone Air", "category": "iphone", "condition": "novo", "price": 5799, "storage": ["256GB", "512GB", "1TB"], "colors": ["Preto Espacial", "Branco Nuvem", "Dourado Claro", "Azul Céu"], "badge": "Lacrado", "warranty": "1 ano Apple", "featured": false, "active": true, "position": 3 },
-    { "id": "ip17", "name": "iPhone 17", "category": "iphone", "condition": "novo", "price": 5599, "storage": ["256GB", "512GB"], "colors": ["Preto", "Branco", "Lavanda", "Sálvia", "Azul Névoa"], "badge": "Lacrado", "warranty": "1 ano Apple", "featured": false, "active": true, "position": 4 },
-    { "id": "ip16pm-s", "name": "iPhone 16 Pro Max", "category": "iphone", "condition": "seminovo", "price": null, "storage": ["256GB", "512GB"], "colors": ["Titânio Natural", "Titânio Deserto", "Titânio Preto"], "badge": "Seminovo selecionado", "warranty": "Garantia da loja", "featured": false, "active": true, "position": 5 },
-    { "id": "ip15pro-s", "name": "iPhone 15 Pro", "category": "iphone", "condition": "seminovo", "price": null, "storage": ["128GB", "256GB"], "colors": ["Titânio Natural", "Titânio Azul"], "badge": "Seminovo selecionado", "warranty": "Garantia da loja", "featured": false, "active": true, "position": 6 },
-    { "id": "ip13pro-s", "name": "iPhone 13 Pro", "category": "iphone", "condition": "seminovo", "price": null, "storage": ["128GB", "256GB"], "colors": ["Grafite", "Azul-Sierra"], "badge": "Seminovo selecionado", "warranty": "Garantia da loja", "featured": false, "active": true, "position": 7 },
+    {
+      "id": "ip17pm",
+      "name": "iPhone 17 Pro Max",
+      "category": "iphone",
+      "condition": "novo",
+      "price": 7599,
+      "storage": ["256GB", "512GB", "1TB", "2TB"],
+      "colors": ["Laranja Cósmico", "Azul Profundo", "Prata"],
+      "badge": "Lançamento",
+      "warranty": "1 ano Apple",
+      "featured": true,
+      "active": true,
+      "position": 1,
+      "units": [
+        {
+          "id": "u_17pm_1",
+          "condition": "novo",
+          "aesthetic_grade": "novo_lacrado",
+          "battery_health": 100,
+          "battery_cycles": 0,
+          "storage": "256GB",
+          "color": "Laranja Cósmico",
+          "price": 7599,
+          "status": "disponivel",
+          "warranty": "1 ano Apple"
+        },
+        {
+          "id": "u_17pm_2",
+          "condition": "novo",
+          "aesthetic_grade": "novo_lacrado",
+          "battery_health": 100,
+          "battery_cycles": 0,
+          "storage": "512GB",
+          "color": "Azul Profundo",
+          "price": 8399,
+          "status": "disponivel",
+          "warranty": "1 ano Apple"
+        }
+      ]
+    },
+    {
+      "id": "ip17p",
+      "name": "iPhone 17 Pro",
+      "category": "iphone",
+      "condition": "novo",
+      "price": 7199,
+      "storage": ["256GB", "512GB", "1TB"],
+      "colors": ["Laranja Cósmico", "Azul Profundo", "Prata"],
+      "badge": "Lançamento",
+      "warranty": "1 ano Apple",
+      "featured": false,
+      "active": true,
+      "position": 2,
+      "units": [
+        {
+          "id": "u_17p_1",
+          "condition": "novo",
+          "aesthetic_grade": "novo_lacrado",
+          "battery_health": 100,
+          "battery_cycles": 0,
+          "storage": "256GB",
+          "color": "Prata",
+          "price": 7199,
+          "status": "disponivel",
+          "warranty": "1 ano Apple"
+        }
+      ]
+    },
+    {
+      "id": "ip16pm-s",
+      "name": "iPhone 16 Pro Max",
+      "category": "iphone",
+      "condition": "seminovo",
+      "price": 5899,
+      "storage": ["256GB", "512GB"],
+      "colors": ["Titânio Natural", "Titânio Deserto", "Titânio Preto"],
+      "badge": "Seminovo Selecionado",
+      "warranty": "Garantia da loja",
+      "featured": false,
+      "active": true,
+      "position": 3,
+      "units": [
+        {
+          "id": "u_16pm_1",
+          "condition": "seminovo",
+          "aesthetic_grade": "excelente",
+          "battery_health": 89,
+          "battery_cycles": 142,
+          "storage": "256GB",
+          "color": "Titânio Natural",
+          "price": 5899,
+          "status": "disponivel",
+          "warranty": "Garantia da Loja"
+        }
+      ]
+    },
+    {
+      "id": "ip15pro-s",
+      "name": "iPhone 15 Pro",
+      "category": "iphone",
+      "condition": "seminovo",
+      "price": 4299,
+      "storage": ["128GB", "256GB"],
+      "colors": ["Titânio Preto", "Titânio Azul", "Titânio Natural"],
+      "badge": "Seminovo Selecionado",
+      "warranty": "Garantia da loja",
+      "featured": false,
+      "active": true,
+      "position": 4,
+      "units": [
+        {
+          "id": "u_15p_1",
+          "condition": "seminovo",
+          "aesthetic_grade": "muito_bom",
+          "battery_health": 81,
+          "battery_cycles": 31,
+          "storage": "128GB",
+          "color": "Titânio Preto",
+          "price": 4299,
+          "status": "disponivel",
+          "warranty": "Garantia da Loja"
+        },
+        {
+          "id": "u_15p_2",
+          "condition": "seminovo",
+          "aesthetic_grade": "excelente",
+          "battery_health": 94,
+          "battery_cycles": 98,
+          "storage": "256GB",
+          "color": "Titânio Azul",
+          "price": 4699,
+          "status": "disponivel",
+          "warranty": "Garantia da Loja"
+        }
+      ]
+    },
+    {
+      "id": "ip13pro-s",
+      "name": "iPhone 13 Pro",
+      "category": "iphone",
+      "condition": "seminovo",
+      "price": 2999,
+      "storage": ["128GB", "256GB"],
+      "colors": ["Grafite", "Azul-Sierra"],
+      "badge": "Seminovo Selecionado",
+      "warranty": "Garantia da loja",
+      "featured": false,
+      "active": true,
+      "position": 5,
+      "units": [
+        {
+          "id": "u_13p_1",
+          "condition": "seminovo",
+          "aesthetic_grade": "bom_usado",
+          "battery_health": 85,
+          "battery_cycles": 260,
+          "storage": "128GB",
+          "color": "Grafite",
+          "price": 2999,
+          "status": "disponivel",
+          "warranty": "Garantia da Loja"
+        }
+      ]
+    },
 
-    { "id": "ipadpro", "name": "iPad Pro", "category": "ipad", "condition": "novo", "price": null, "storage": ["256GB", "512GB", "1TB"], "colors": ["Preto Espacial", "Prateado"], "badge": "Lacrado", "warranty": "1 ano Apple", "featured": false, "active": true, "position": 1 },
-    { "id": "ipadair", "name": "iPad Air", "category": "ipad", "condition": "novo", "price": null, "storage": ["128GB", "256GB"], "colors": ["Cinza Espacial", "Azul", "Roxo", "Estelar"], "badge": "Lacrado", "warranty": "1 ano Apple", "featured": false, "active": true, "position": 2 },
-    { "id": "ipadmini", "name": "iPad mini", "category": "ipad", "condition": "novo", "price": null, "storage": ["128GB", "256GB"], "colors": ["Cinza Espacial", "Azul", "Roxo", "Estelar"], "badge": "Lacrado", "warranty": "1 ano Apple", "featured": false, "active": true, "position": 3 },
-
-    { "id": "mba13m4", "name": "MacBook Air 13″ M4", "category": "macbook", "condition": "novo", "price": 9999, "storage": ["16GB · 256GB", "16GB · 512GB"], "colors": ["Meia-noite", "Estelar", "Azul-céu", "Prateado"], "badge": "Promoção", "warranty": "1 ano Apple", "featured": false, "active": true, "position": 1 },
-    { "id": "mba15m4", "name": "MacBook Air 15″ M4", "category": "macbook", "condition": "novo", "price": null, "storage": ["16GB · 256GB", "16GB · 512GB"], "colors": ["Meia-noite", "Estelar", "Azul-céu", "Prateado"], "badge": "Lacrado", "warranty": "1 ano Apple", "featured": false, "active": true, "position": 2 },
-    { "id": "mbp14", "name": "MacBook Pro 14″", "category": "macbook", "condition": "novo", "price": null, "storage": ["16GB · 512GB", "24GB · 1TB"], "colors": ["Preto Espacial", "Prateado"], "badge": "Lacrado", "warranty": "1 ano Apple", "featured": false, "active": true, "position": 3 },
-
-    { "id": "macmini", "name": "Mac mini M4", "category": "macmini", "condition": "novo", "price": null, "storage": ["16GB · 256GB", "16GB · 512GB"], "colors": ["Prateado"], "badge": "Lacrado", "warranty": "1 ano Apple", "featured": false, "active": true, "position": 1 },
-
-    { "id": "watchultra", "name": "Apple Watch Ultra", "category": "watch", "condition": "novo", "price": null, "storage": ["49 mm"], "colors": ["Titânio Natural", "Titânio Preto"], "badge": "Lacrado", "warranty": "1 ano Apple", "featured": false, "active": true, "position": 1 },
-    { "id": "watchs", "name": "Apple Watch Series", "category": "watch", "condition": "novo", "price": null, "storage": ["42 mm", "46 mm"], "colors": ["Preto Brilhante", "Prateado", "Ouro Rosa"], "badge": "Lacrado", "warranty": "1 ano Apple", "featured": false, "active": true, "position": 2 },
-    { "id": "watchse", "name": "Apple Watch SE", "category": "watch", "condition": "novo", "price": null, "storage": ["40 mm", "44 mm"], "colors": ["Meia-noite", "Estelar"], "badge": "Lacrado", "warranty": "1 ano Apple", "featured": false, "active": true, "position": 3 },
-
-    { "id": "airpodspro", "name": "AirPods Pro", "category": "acessorios", "condition": "novo", "price": null, "storage": [], "colors": ["Branco"], "badge": "Lacrado", "warranty": "1 ano Apple", "featured": false, "active": true, "position": 1 },
-    { "id": "airpods4", "name": "AirPods 4", "category": "acessorios", "condition": "novo", "price": null, "storage": [], "colors": ["Branco"], "badge": "Lacrado", "warranty": "1 ano Apple", "featured": false, "active": true, "position": 2 },
-    { "id": "magsafe", "name": "Capas e carregadores MagSafe", "category": "acessorios", "condition": "novo", "price": null, "storage": [], "colors": [], "badge": "Originais", "warranty": "Garantia do fabricante", "featured": false, "active": true, "position": 3 }
+    {
+      "id": "mba13m4",
+      "name": "MacBook Air 13″ M4",
+      "category": "macbook",
+      "condition": "novo",
+      "price": 9999,
+      "storage": ["16GB · 256GB", "16GB · 512GB"],
+      "colors": ["Meia-noite", "Estelar", "Azul-céu", "Prateado"],
+      "badge": "Promoção",
+      "warranty": "1 ano Apple",
+      "featured": false,
+      "active": true,
+      "position": 6,
+      "units": [
+        {
+          "id": "u_mba13_1",
+          "condition": "novo",
+          "aesthetic_grade": "novo_lacrado",
+          "battery_health": 100,
+          "battery_cycles": 0,
+          "storage": "16GB · 256GB",
+          "color": "Meia-noite",
+          "price": 9999,
+          "status": "disponivel",
+          "warranty": "1 ano Apple"
+        }
+      ]
+    },
+    {
+      "id": "mbp14",
+      "name": "MacBook Pro 14″ M3 Pro",
+      "category": "macbook",
+      "condition": "seminovo",
+      "price": 12499,
+      "storage": ["18GB · 512GB"],
+      "colors": ["Preto Espacial", "Prateado"],
+      "badge": "Seminovo Selecionado",
+      "warranty": "Garantia da loja",
+      "featured": false,
+      "active": true,
+      "position": 7,
+      "units": [
+        {
+          "id": "u_mbp14_1",
+          "condition": "seminovo",
+          "aesthetic_grade": "excelente",
+          "battery_health": 98,
+          "battery_cycles": 45,
+          "storage": "18GB · 512GB",
+          "color": "Preto Espacial",
+          "price": 12499,
+          "status": "disponivel",
+          "warranty": "Garantia da Loja"
+        }
+      ]
+    },
+    {
+      "id": "ipadpro",
+      "name": "iPad Pro M4",
+      "category": "ipad",
+      "condition": "novo",
+      "price": null,
+      "storage": ["256GB", "512GB", "1TB"],
+      "colors": ["Preto Espacial", "Prateado"],
+      "badge": "Lacrado",
+      "warranty": "1 ano Apple",
+      "featured": false,
+      "active": true,
+      "position": 8,
+      "units": []
+    },
+    {
+      "id": "watchultra",
+      "name": "Apple Watch Ultra 2",
+      "category": "watch",
+      "condition": "novo",
+      "price": 5499,
+      "storage": ["49 mm"],
+      "colors": ["Titânio Natural", "Titânio Preto"],
+      "badge": "Lacrado",
+      "warranty": "1 ano Apple",
+      "featured": false,
+      "active": true,
+      "position": 9,
+      "units": [
+        {
+          "id": "u_wu2_1",
+          "condition": "novo",
+          "aesthetic_grade": "novo_lacrado",
+          "battery_health": 100,
+          "battery_cycles": 0,
+          "storage": "49 mm",
+          "color": "Titânio Natural",
+          "price": 5499,
+          "status": "disponivel",
+          "warranty": "1 ano Apple"
+        }
+      ]
+    }
   ]
 }

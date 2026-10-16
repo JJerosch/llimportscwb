@@ -5,11 +5,12 @@
 -- 1. Acesse o painel do Supabase (https://supabase.com/dashboard)
 -- 2. Abra o seu projeto e clique no menu "SQL Editor" na barra lateral
 -- 3. Cole este script inteiro e clique no botão verde "Run" (Executar)
--- 4. O banco será criado com todas as tabelas, regras de segurança (RLS)
+-- 4. O banco será criado com todas as tabelas, regras de segurança (RLS),
+--    a nova mecânica de modelos e estoque de unidades com bateria/grau estético,
 --    e todo o catálogo inicial já populado com dados reais da LL Imports CWB!
 -- ==========================================================================
 
--- Extensão para geração de UUIDs (geralmente ativa por padrão no Supabase)
+-- Extensão para geração de UUIDs (ativa por padrão no Supabase)
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- ==========================================================================
@@ -84,46 +85,120 @@ CREATE POLICY "Apenas admins alteram seções"
   WITH CHECK (auth.uid() IN (SELECT user_id FROM public.admins));
 
 -- ==========================================================================
--- 4. TABELA DE PRODUTOS / MODELOS (COM SUPORTE A IMAGENS NA AWS S3)
+-- 4. MECÂNICA 1: MODELOS DE PRODUTOS (CATÁLOGO DA LOJA)
 -- ==========================================================================
-CREATE TABLE IF NOT EXISTS public.products (
+CREATE TABLE IF NOT EXISTS public.product_models (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name TEXT NOT NULL,
-  category TEXT NOT NULL CHECK (category IN ('iphone', 'ipad', 'macbook', 'macmini', 'watch', 'acessorios')),
-  condition TEXT NOT NULL CHECK (condition IN ('novo', 'seminovo')),
-  -- PROTEÇÃO CONTRA PREÇOS ABSURDOS:
-  -- NULL = "Consulte no WhatsApp". Se numérico, entre R$ 50 e R$ 60.000.
-  price NUMERIC CHECK (price IS NULL OR (price >= 50 AND price <= 60000)),
-  storage TEXT[] DEFAULT '{}',
-  colors TEXT[] DEFAULT '{}',
-  badge TEXT,
-  warranty TEXT NOT NULL DEFAULT '1 ano Apple',
-  -- Link da imagem hospedada na AWS S3 ou CloudFront (ex: https://meu-bucket.s3.amazonaws.com/ip17promax.png)
-  image_url TEXT,
-  featured BOOLEAN NOT NULL DEFAULT false,
-  active BOOLEAN NOT NULL DEFAULT true,
+  name TEXT NOT NULL,                                 -- Ex: "iPhone 15 Pro", "MacBook Air 13″ M3"
+  category TEXT NOT NULL CHECK (
+    category IN ('iphone', 'ipad', 'macbook', 'macmini', 'watch', 'acessorios')
+  ),
+  default_image_url TEXT,                             -- Imagem oficial de referência no AWS S3
+  description TEXT,
+  active BOOLEAN NOT NULL DEFAULT true,               -- Exibir ou ocultar da vitrine
   position INTEGER NOT NULL DEFAULT 0,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.product_models ENABLE ROW LEVEL SECURITY;
 
-DROP POLICY IF EXISTS "Leitura pública de produtos ativos" ON public.products;
-CREATE POLICY "Leitura pública de produtos ativos" 
-  ON public.products FOR SELECT 
+DROP POLICY IF EXISTS "Leitura pública de modelos ativos" ON public.product_models;
+CREATE POLICY "Leitura pública de modelos ativos" 
+  ON public.product_models FOR SELECT 
   TO public 
   USING (active = true OR auth.uid() IN (SELECT user_id FROM public.admins));
 
-DROP POLICY IF EXISTS "Apenas admins gerenciam produtos" ON public.products;
-CREATE POLICY "Apenas admins gerenciam produtos" 
-  ON public.products FOR ALL 
+DROP POLICY IF EXISTS "Apenas admins gerenciam modelos" ON public.product_models;
+CREATE POLICY "Apenas admins gerenciam modelos" 
+  ON public.product_models FOR ALL 
   TO authenticated 
   USING (auth.uid() IN (SELECT user_id FROM public.admins))
   WITH CHECK (auth.uid() IN (SELECT user_id FROM public.admins));
 
 -- ==========================================================================
--- 5. TABELA DE AVALIAÇÕES / DEPOIMENTOS DE CLIENTES
+-- 5. MECÂNICA 2: UNIDADES EM ESTOQUE (CONDIÇÃO, BATERIA & CICLOS REAIS)
+-- ==========================================================================
+CREATE TABLE IF NOT EXISTS public.product_units (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  model_id UUID NOT NULL REFERENCES public.product_models(id) ON DELETE CASCADE,
+  
+  -- Condição
+  condition TEXT NOT NULL CHECK (condition IN ('novo', 'seminovo')),
+  
+  -- Qualidade estética
+  aesthetic_grade TEXT NOT NULL CHECK (
+    aesthetic_grade IN ('novo_lacrado', 'excelente', 'muito_bom', 'bom_usado')
+  ),
+  -- novo_lacrado: Caixa lacrada de fábrica com 1 ano Apple
+  -- excelente: Sem marcas de uso, como novo (Grade A+)
+  -- muito_bom: Mínimos sinais imperceptíveis (Grade A)
+  -- bom_usado: Sinais normais de uso (Grade B)
+
+  -- Qualidade da bateria
+  battery_health INTEGER CHECK (
+    battery_health IS NULL OR (battery_health >= 50 AND battery_health <= 100)
+  ), -- Ex: 81 para 81%
+  
+  battery_cycles INTEGER CHECK (
+    battery_cycles IS NULL OR battery_cycles >= 0
+  ), -- Ex: 31 para 31 ciclos
+
+  -- Especificações da unidade
+  storage TEXT NOT NULL,                              -- Ex: "128GB", "256GB", "16GB / 512GB"
+  color TEXT NOT NULL,                                -- Ex: "Titânio Natural", "Meia-noite"
+  
+  -- Preço da unidade com trava anti-erro (entre R$ 50 e R$ 60.000)
+  price NUMERIC CHECK (price IS NULL OR (price >= 50 AND price <= 60000)),
+  
+  status TEXT NOT NULL DEFAULT 'disponivel' CHECK (
+    status IN ('disponivel', 'reservado', 'vendido')
+  ),
+  
+  warranty TEXT NOT NULL DEFAULT 'Garantia da Loja',
+  unit_photos TEXT[] DEFAULT '{}',                   -- Fotos reais no S3 dessa unidade
+  notes TEXT,                                         -- Observações (ex: "Acompanha caixa e cabo")
+  
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.product_units ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Leitura pública de unidades disponíveis" ON public.product_units;
+CREATE POLICY "Leitura pública de unidades disponíveis" 
+  ON public.product_units FOR SELECT 
+  TO public 
+  USING (status = 'disponivel' OR auth.uid() IN (SELECT user_id FROM public.admins));
+
+DROP POLICY IF EXISTS "Apenas admins gerenciam unidades" ON public.product_units;
+CREATE POLICY "Apenas admins gerenciam unidades" 
+  ON public.product_units FOR ALL 
+  TO authenticated 
+  USING (auth.uid() IN (SELECT user_id FROM public.admins))
+  WITH CHECK (auth.uid() IN (SELECT user_id FROM public.admins));
+
+-- ==========================================================================
+-- 6. VIEW INTELIGENTE DO CATÁLOGO (MODELO + MENOR PREÇO + QUANTIDADES)
+-- ==========================================================================
+CREATE OR REPLACE VIEW public.v_catalog_showcase AS
+SELECT 
+  m.id AS model_id,
+  m.name AS model_name,
+  m.category,
+  m.default_image_url,
+  m.position,
+  MIN(u.price) AS starting_price,
+  COUNT(u.id) FILTER (WHERE u.status = 'disponivel') AS total_units_available,
+  COUNT(u.id) FILTER (WHERE u.status = 'disponivel' AND u.condition = 'novo') AS new_units_count,
+  COUNT(u.id) FILTER (WHERE u.status = 'disponivel' AND u.condition = 'seminovo') AS used_units_count
+FROM public.product_models m
+LEFT JOIN public.product_units u ON u.model_id = m.id AND u.status = 'disponivel'
+WHERE m.active = true
+GROUP BY m.id;
+
+-- ==========================================================================
+-- 7. TABELA DE AVALIAÇÕES / DEPOIMENTOS DE CLIENTES
 -- ==========================================================================
 CREATE TABLE IF NOT EXISTS public.reviews (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -152,10 +227,10 @@ CREATE POLICY "Apenas admins gerenciam reviews"
   WITH CHECK (auth.uid() IN (SELECT user_id FROM public.admins));
 
 -- ==========================================================================
--- 6. DADOS INICIAIS (SEED AUTOMÁTICO COMPLETO)
+-- 8. SEED AUTOMÁTICO COMPLETO (DADOS REAIS COM AS 2 MECÂNICAS)
 -- ==========================================================================
 
--- 6.1 Configurações da Loja
+-- 8.1 Configurações da Loja
 INSERT INTO public.site_settings (key, value)
 VALUES 
   ('general', '{
@@ -181,7 +256,7 @@ VALUES
   }'::jsonb)
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value;
 
--- 6.2 Seções da Landing Page
+-- 8.2 Seções da Landing Page
 INSERT INTO public.sections (key, title, subtitle, content, visible, position)
 VALUES
   ('hero', 'O Apple dos seus sonhos', 'com a exclusividade que você merece.', '{
@@ -286,7 +361,7 @@ ON CONFLICT (key) DO UPDATE SET
   visible = EXCLUDED.visible,
   position = EXCLUDED.position;
 
--- 6.3 Avaliações Reais de Clientes (Google Reviews)
+-- 8.3 Avaliações Reais de Clientes (Google Reviews)
 DELETE FROM public.reviews;
 INSERT INTO public.reviews (name, badge, stars, text, position)
 VALUES
@@ -294,42 +369,56 @@ VALUES
   ('Rita Pacheco', 'Local Guide Google', 5, 'Fui até a loja por indicação de duas amigas e não me arrependi! Atendimento personalizado e encontramos o modelo de celular perfeito funcionando bem! Oferecem acessórios também! Recomendo!', 2),
   ('Lucas K.', 'Cliente Verificado', 5, 'Comprei um MacBook Air M4 e o atendimento superou qualquer loja oficial. Preço muito mais justo, peguei em mãos na sala no Cabral no mesmo dia. Nota 10!', 3);
 
--- 6.4 Modelos de Produtos (Catálogo Inicial - Novos & Seminovos com Preços Calibrados)
-DELETE FROM public.products;
-INSERT INTO public.products (name, category, condition, price, storage, colors, badge, warranty, featured, active, position)
+-- 8.4 Modelos de Catálogo (Mecânica 1) e Unidades em Estoque (Mecânica 2)
+DELETE FROM public.product_units;
+DELETE FROM public.product_models;
+
+-- Modelos
+INSERT INTO public.product_models (id, name, category, default_image_url, active, position)
 VALUES
-  ('iPhone 17 Pro Max', 'iphone', 'novo', 7599.00, ARRAY['256GB', '512GB', '1TB', '2TB'], ARRAY['Laranja Cósmico', 'Azul Profundo', 'Prata'], 'Lançamento', '1 ano Apple', true, true, 1),
-  ('iPhone 17 Pro', 'iphone', 'novo', 7199.00, ARRAY['256GB', '512GB', '1TB'], ARRAY['Laranja Cósmico', 'Azul Profundo', 'Prata'], 'Lançamento', '1 ano Apple', false, true, 2),
-  ('iPhone Air', 'iphone', 'novo', 5799.00, ARRAY['256GB', '512GB', '1TB'], ARRAY['Preto Espacial', 'Branco Nuvem', 'Dourado Claro', 'Azul Céu'], 'Lacrado', '1 ano Apple', false, true, 3),
-  ('iPhone 17', 'iphone', 'novo', 5599.00, ARRAY['256GB', '512GB'], ARRAY['Preto', 'Branco', 'Lavanda', 'Sálvia', 'Azul Névoa'], 'Lacrado', '1 ano Apple', false, true, 4),
-  ('iPhone 16 Pro Max', 'iphone', 'seminovo', NULL, ARRAY['256GB', '512GB'], ARRAY['Titânio Natural', 'Titânio Deserto', 'Titânio Preto'], 'Seminovo Selecionado', 'Garantia da loja', false, true, 5),
-  ('iPhone 15 Pro', 'iphone', 'seminovo', NULL, ARRAY['128GB', '256GB'], ARRAY['Titânio Natural', 'Titânio Azul'], 'Seminovo Selecionado', 'Garantia da loja', false, true, 6),
-  ('iPhone 13 Pro', 'iphone', 'seminovo', NULL, ARRAY['128GB', '256GB'], ARRAY['Grafite', 'Azul-Sierra'], 'Seminovo Selecionado', 'Garantia da loja', false, true, 7),
-  
-  ('iPad Pro M4', 'ipad', 'novo', NULL, ARRAY['256GB', '512GB', '1TB'], ARRAY['Preto Espacial', 'Prateado'], 'Lacrado', '1 ano Apple', false, true, 8),
-  ('iPad Air M2', 'ipad', 'novo', NULL, ARRAY['128GB', '256GB'], ARRAY['Cinza Espacial', 'Azul', 'Estelar'], 'Lacrado', '1 ano Apple', false, true, 9),
-  ('iPad 10ª Geração', 'ipad', 'novo', NULL, ARRAY['64GB', '256GB'], ARRAY['Prateado', 'Azul', 'Rosa', 'Amarelo'], 'Lacrado', '1 ano Apple', false, true, 10),
+  ('00000000-0000-0000-0000-000000000001', 'iPhone 17 Pro Max', 'iphone', NULL, true, 1),
+  ('00000000-0000-0000-0000-000000000002', 'iPhone 17 Pro', 'iphone', NULL, true, 2),
+  ('00000000-0000-0000-0000-000000000003', 'iPhone 16 Pro Max', 'iphone', NULL, true, 3),
+  ('00000000-0000-0000-0000-000000000004', 'iPhone 15 Pro', 'iphone', NULL, true, 4),
+  ('00000000-0000-0000-0000-000000000005', 'iPhone 13 Pro', 'iphone', NULL, true, 5),
+  ('00000000-0000-0000-0000-000000000006', 'MacBook Air 13″ M4', 'macbook', NULL, true, 6),
+  ('00000000-0000-0000-0000-000000000007', 'MacBook Pro 14″ M3 Pro', 'macbook', NULL, true, 7),
+  ('00000000-0000-0000-0000-000000000008', 'iPad Pro M4', 'ipad', NULL, true, 8),
+  ('00000000-0000-0000-0000-000000000009', 'Apple Watch Ultra 2', 'watch', NULL, true, 9);
 
-  ('MacBook Air 13″ M4', 'macbook', 'novo', 9999.00, ARRAY['16GB · 256GB', '16GB · 512GB'], ARRAY['Meia-noite', 'Estelar', 'Azul-céu', 'Prateado'], 'Promoção', '1 ano Apple', false, true, 11),
-  ('MacBook Air 15″ M4', 'macbook', 'novo', NULL, ARRAY['16GB · 256GB', '16GB · 512GB'], ARRAY['Meia-noite', 'Estelar', 'Prateado'], 'Lacrado', '1 ano Apple', false, true, 12),
-  ('MacBook Pro 14″ M4 Pro', 'macbook', 'novo', NULL, ARRAY['24GB · 512GB', '48GB · 1TB'], ARRAY['Preto Espacial', 'Prateado'], 'Lacrado', '1 ano Apple', false, true, 13),
+-- Unidades com Bateria, Ciclos e Condição Estética
+INSERT INTO public.product_units (model_id, condition, aesthetic_grade, battery_health, battery_cycles, storage, color, price, status, warranty, notes)
+VALUES
+  -- iPhone 17 Pro Max (Novo)
+  ('00000000-0000-0000-0000-000000000001', 'novo', 'novo_lacrado', 100, 0, '256GB', 'Laranja Cósmico', 7599.00, 'disponivel', '1 ano Apple', 'Novo lacrado de fábrica com nota fiscal'),
+  ('00000000-0000-0000-0000-000000000001', 'novo', 'novo_lacrado', 100, 0, '512GB', 'Azul Profundo', 8399.00, 'disponivel', '1 ano Apple', 'Novo lacrado de fábrica'),
 
-  ('Mac mini M4', 'macmini', 'novo', NULL, ARRAY['16GB · 256GB', '16GB · 512GB'], ARRAY['Prateado'], 'Lacrado', '1 ano Apple', false, true, 14),
+  -- iPhone 17 Pro (Novo)
+  ('00000000-0000-0000-0000-000000000002', 'novo', 'novo_lacrado', 100, 0, '256GB', 'Prata', 7199.00, 'disponivel', '1 ano Apple', 'Novo lacrado'),
 
-  ('Apple Watch Ultra 2', 'watch', 'novo', NULL, ARRAY['49 mm'], ARRAY['Titânio Natural', 'Titânio Preto'], 'Lacrado', '1 ano Apple', false, true, 15),
-  ('Apple Watch Series 10', 'watch', 'novo', NULL, ARRAY['42 mm', '46 mm'], ARRAY['Preto Brilhante', 'Prateado', 'Ouro Rosa'], 'Lacrado', '1 ano Apple', false, true, 16),
-  ('Apple Watch SE', 'watch', 'novo', NULL, ARRAY['40 mm', '44 mm'], ARRAY['Meia-noite', 'Estelar', 'Prateado'], 'Lacrado', '1 ano Apple', false, true, 17),
+  -- iPhone 16 Pro Max (Seminovo Excelente)
+  ('00000000-0000-0000-0000-000000000003', 'seminovo', 'excelente', 89, 142, '256GB', 'Titânio Natural', 5899.00, 'disponivel', 'Garantia da Loja', 'Impecável, sem detalhes, bateria original em 89% com 142 ciclos'),
 
-  ('AirPods Pro 2', 'acessorios', 'novo', NULL, ARRAY[]::TEXT[], ARRAY['Branco'], 'Lacrado', '1 ano Apple', false, true, 18),
-  ('AirPods 4', 'acessorios', 'novo', NULL, ARRAY[]::TEXT[], ARRAY['Branco'], 'Lacrado', '1 ano Apple', false, true, 19),
-  ('Carregador Apple 20W USB-C', 'acessorios', 'novo', 199.00, ARRAY[]::TEXT[], ARRAY['Branco'], 'Original', '1 ano Apple', false, true, 20);
+  -- iPhone 15 Pro (Seminovo Muito Bom com 81% e 31 ciclos como solicitado)
+  ('00000000-0000-0000-0000-000000000004', 'seminovo', 'muito_bom', 81, 31, '128GB', 'Titânio Preto', 4299.00, 'disponivel', 'Garantia da Loja', 'Aparelho revisado, mínimas marcas de uso, bateria com 81% e apenas 31 ciclos'),
+  ('00000000-0000-0000-0000-000000000004', 'seminovo', 'excelente', 94, 98, '256GB', 'Titânio Azul', 4699.00, 'disponivel', 'Garantia da Loja', 'Estado impecável de conservação, bateria 94% com 98 ciclos'),
+
+  -- iPhone 13 Pro (Seminovo Bom/Usado)
+  ('00000000-0000-0000-0000-000000000005', 'seminovo', 'bom_usado', 85, 260, '128GB', 'Grafite', 2999.00, 'disponivel', 'Garantia da Loja', 'Aparelho 100% funcional com pequenas marcas de uso na borda'),
+
+  -- MacBook Air 13″ M4 (Novo)
+  ('00000000-0000-0000-0000-000000000006', 'novo', 'novo_lacrado', 100, 0, '16GB · 256GB', 'Meia-noite', 9999.00, 'disponivel', '1 ano Apple', 'Lacrado com teclado padrão Apple e 1 ano de garantia'),
+
+  -- MacBook Pro 14″ M3 Pro (Seminovo Excelente com ciclos de bateria)
+  ('00000000-0000-0000-0000-000000000007', 'seminovo', 'excelente', 98, 45, '18GB · 512GB', 'Preto Espacial', 12499.00, 'disponivel', 'Garantia da Loja', 'Bateria com 98% e apenas 45 ciclos. Acompanha carregador MagSafe original'),
+
+  -- Apple Watch Ultra 2 (Novo)
+  ('00000000-0000-0000-0000-000000000009', 'novo', 'novo_lacrado', 100, 0, '49 mm', 'Titânio Natural', 5499.00, 'disponivel', '1 ano Apple', 'Caixa lacrada');
 
 -- ==========================================================================
--- 7. COMO CADASTRAR O SEU USUÁRIO COMO ADMINISTRADOR
+-- 9. COMO VINCULAR SEU USUÁRIO COMO ADMINISTRADOR
 -- ==========================================================================
--- Após criar uma conta no Supabase Auth com seu e-mail:
--- Basta rodar este comando substituindo 'SEU_EMAIL_AQUI' pelo seu e-mail:
--- 
+-- Após criar um usuário no Supabase Auth:
 -- INSERT INTO public.admins (user_id, email)
 -- SELECT id, email FROM auth.users WHERE email = 'seu_email@exemplo.com'
 -- ON CONFLICT (user_id) DO NOTHING;

@@ -38,6 +38,31 @@ export function splitWords(text = '') {
   return text.split(/\s+/).filter(Boolean);
 }
 
+/** Formata o grau estético da unidade para exibição elegante */
+export function formatAestheticGrade(grade) {
+  switch (grade) {
+    case 'novo_lacrado':
+      return 'Novo Lacrado';
+    case 'excelente':
+      return 'Excelente (Grade A+)';
+    case 'muito_bom':
+      return 'Muito Bom (Grade A)';
+    case 'bom_usado':
+      return 'Bom / Usado (Grade B)';
+    default:
+      return grade || 'Excelente';
+  }
+}
+
+/** Formata saúde e ciclos da bateria */
+export function formatBattery(health, cycles) {
+  if (!health && !cycles) return null;
+  const parts = [];
+  if (health) parts.push(`Bateria ${health}%`);
+  if (cycles) parts.push(`${cycles} ciclos`);
+  return parts.join(' · ');
+}
+
 /** Retorna a seção visível pela chave, ou null. */
 export function getSection(sections, key) {
   const section = sections.find((s) => s.key === key);

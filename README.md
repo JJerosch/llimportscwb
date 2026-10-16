@@ -33,22 +33,25 @@ c:\LLImports\
    - Hero dinâmico com revelação de palavras e rotacionador animado de termos (*iPhone*, *MacBook*, *iPad*, *Apple Watch*).
    - Mockups de alta fidelidade que substituem imagens quebradas e dão aspecto de keynote da Apple.
 
-2. **Catálogo por Modelo (Novos & Seminovos)**:
-   - Filtros instantâneos por categoria e por condição (*Novo Lacrado* vs. *Seminovo Selecionado*).
-   - Preços oficiais calibrados com proteção no banco e formulário contra valores anômalos (`CHECK (price IS NULL OR price BETWEEN 50 AND 60000)`).
-   - Botão direto para WhatsApp com mensagem e modelo já pré-configurados.
-   - Suporte a imagens reais hospedadas na **AWS S3** ou exibição automática de mockups de fallback.
+2. **Catálogo Inteligente com as 2 Mecânicas**:
+   - **Mecânica 1 (Modelos de Aparelhos):** Cadastro e customização de quais modelos de iPhone, MacBook, iPad e Apple Watch estão comercializados e ativos na vitrine da loja.
+   - **Mecânica 2 (Unidades em Estoque com Bateria & Grau Estético):** Cada modelo possui unidades físicas detalhadas com:
+     - **Grau Estético Real:** *Novo Lacrado*, *Excelente (Grade A+ · Como novo)*, *Muito Bom (Grade A · Sinais mínimos)* ou *Bom / Usado (Grade B)*.
+     - **Saúde & Ciclos da Bateria:** Percentual real de saúde (ex: `81%`, `94%`, `100%`) e contagem exata de ciclos (ex: `31 ciclos`, `142 ciclos`).
+     - **Seletor Interativo na Vitrine:** Se um modelo tiver mais de uma unidade disponível (ex: iPhone 15 Pro de 128GB a R$ 4.299 com 81% de bateria vs 256GB a R$ 4.699 com 94%), o cliente pode alternar entre elas dinamicamente no card.
+     - Preços calibrados com trava no banco e formulário (`CHECK (price IS NULL OR price BETWEEN 50 AND 60000)`).
+     - Botão direto para WhatsApp com mensagem personalizada contendo o modelo, armazenamento, cor, grau estético e dados de bateria da unidade selecionada.
 
 3. **Prova Social e Autoridade Real (@llimportscwb)**:
    - Métricas reais do Instagram: 4 anos de mercado, +2.000 clientes atendidos e 12,2 mil seguidores.
    - Avaliações reais com 5 estrelas do Google Reviews (clientes de Curitiba).
    - Localização no Cabral (Rua Anita Garibaldi, 850, Sala 401, Torre C) com aviso de atendimento com hora marcada.
 
-4. **Painel do Administrador (Admin Drawer)**:
-   - Acesso restrito a administradores via Supabase Auth (com RLS) ou simulação local.
-   - Cadastro de novos modelos com validação de faixa de preço e URL de foto no S3.
-   - Edição de preços inline e remoção de modelos.
-   - Controle de visibilidade das seções da landing page em tempo real.
+4. **Painel do Administrador (Admin Drawer com 3 Abas)**:
+   - Acesso restrito via Supabase Auth (com RLS) ou simulação local aprovada.
+   - **Aba Modelos (Mecânica 1):** Ativar/ocultar modelos da loja com 1 clique (`active: true/false`), cadastrar novos modelos e fotos no AWS S3.
+   - **Aba Estoque & Bateria (Mecânica 2):** Cadastrar unidades vinculadas a qualquer modelo, informando condição, grau estético, saúde da bateria (%), ciclos, armazenamento, cor e preço com trava anti-erro. Alterne o status para *Disponível* ou *Vendido*.
+   - **Aba Seções da Página:** Controle de visibilidade em tempo real das seções da landing page.
 
 ---
 
