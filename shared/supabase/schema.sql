@@ -1,13 +1,14 @@
 -- ==========================================================================
--- LL IMPORTS CWB — BANCO DE DADOS COMPLETO PARA O SUPABASE (POSTGRESQL)
+-- LL IMPORTS CWB — BANCO DE DADOS SUPABASE (POSTGRESQL)
+-- MODELO BASEADO EM TAGS DE QUALIDADES (SEM CONTROLE DE ESTOQUE INDIVIDUAL)
 -- 
 -- INSTRUÇÕES DE INSTALAÇÃO:
 -- 1. Acesse o painel do Supabase (https://supabase.com/dashboard)
 -- 2. Abra o seu projeto e clique no menu "SQL Editor" na barra lateral
 -- 3. Cole este script inteiro e clique no botão verde "Run" (Executar)
 -- 4. O banco será criado com todas as tabelas, regras de segurança (RLS),
---    a nova mecânica de modelos e estoque de unidades com bateria/grau estético,
---    e todo o catálogo inicial já populado com dados reais da LL Imports CWB!
+--    a tabela de modelos, tabelas de qualidades do aparelho e de bateria,
+--    a tabela relacional com tags de disponibilidade, e dados iniciais!
 -- ==========================================================================
 
 -- Extensão para geração de UUIDs (ativa por padrão no Supabase)
@@ -85,15 +86,15 @@ CREATE POLICY "Apenas admins alteram seções"
   WITH CHECK (auth.uid() IN (SELECT user_id FROM public.admins));
 
 -- ==========================================================================
--- 4. MECÂNICA 1: MODELOS DE PRODUTOS (CATÁLOGO DA LOJA)
+-- 4. TABELA DE MODELOS DE APARELHO
 -- ==========================================================================
 CREATE TABLE IF NOT EXISTS public.product_models (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name TEXT NOT NULL,                                 -- Ex: "iPhone 15 Pro", "MacBook Air 13″ M3"
+  name TEXT NOT NULL,                                 -- Ex: "iPhone 15 Pro", "MacBook Air 13″ M4"
   category TEXT NOT NULL CHECK (
     category IN ('iphone', 'ipad', 'macbook', 'macmini', 'watch', 'acessorios')
   ),
-  default_image_url TEXT,                             -- Imagem oficial de referência no AWS S3
+  default_image_url TEXT,                             -- Imagem de referência no AWS S3
   description TEXT,
   active BOOLEAN NOT NULL DEFAULT true,               -- Exibir ou ocultar da vitrine
   position INTEGER NOT NULL DEFAULT 0,
@@ -117,70 +118,110 @@ CREATE POLICY "Apenas admins gerenciam modelos"
   WITH CHECK (auth.uid() IN (SELECT user_id FROM public.admins));
 
 -- ==========================================================================
--- 5. MECÂNICA 2: UNIDADES EM ESTOQUE (CONDIÇÃO, BATERIA & CICLOS REAIS)
+-- 5. TABELA DE QUALIDADES DO APARELHO (CONDIÇÃO ESTÉTICA)
 -- ==========================================================================
-CREATE TABLE IF NOT EXISTS public.product_units (
+CREATE TABLE IF NOT EXISTS public.device_qualities (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  model_id UUID NOT NULL REFERENCES public.product_models(id) ON DELETE CASCADE,
-  
-  -- Condição
-  condition TEXT NOT NULL CHECK (condition IN ('novo', 'seminovo')),
-  
-  -- Qualidade estética
-  aesthetic_grade TEXT NOT NULL CHECK (
-    aesthetic_grade IN ('novo_lacrado', 'excelente', 'muito_bom', 'bom_usado')
-  ),
-  -- novo_lacrado: Caixa lacrada de fábrica com 1 ano Apple
-  -- excelente: Sem marcas de uso, como novo (Grade A+)
-  -- muito_bom: Mínimos sinais imperceptíveis (Grade A)
-  -- bom_usado: Sinais normais de uso (Grade B)
-
-  -- Qualidade da bateria
-  battery_health INTEGER CHECK (
-    battery_health IS NULL OR (battery_health >= 50 AND battery_health <= 100)
-  ), -- Ex: 81 para 81%
-  
-  battery_cycles INTEGER CHECK (
-    battery_cycles IS NULL OR battery_cycles >= 0
-  ), -- Ex: 31 para 31 ciclos
-
-  -- Especificações da unidade
-  storage TEXT NOT NULL,                              -- Ex: "128GB", "256GB", "16GB / 512GB"
-  color TEXT NOT NULL,                                -- Ex: "Titânio Natural", "Meia-noite"
-  
-  -- Preço da unidade com trava anti-erro (entre R$ 50 e R$ 60.000)
-  price NUMERIC CHECK (price IS NULL OR (price >= 50 AND price <= 60000)),
-  
-  status TEXT NOT NULL DEFAULT 'disponivel' CHECK (
-    status IN ('disponivel', 'reservado', 'vendido')
-  ),
-  
-  warranty TEXT NOT NULL DEFAULT 'Garantia da Loja',
-  unit_photos TEXT[] DEFAULT '{}',                   -- Fotos reais no S3 dessa unidade
-  notes TEXT,                                         -- Observações (ex: "Acompanha caixa e cabo")
-  
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+  slug TEXT NOT NULL UNIQUE,                         -- 'novo_lacrado', 'excelente', 'muito_bom', 'usado'
+  name TEXT NOT NULL,                                 -- 'Novo Lacrado', 'Excelente (Grade A+)', 'Muito Bom (Grade A)', 'Usado (Grade B)'
+  badge_label TEXT NOT NULL,                          -- 'Lacrado', 'Grade A+', 'Grade A', 'Grade B'
+  description TEXT,                                   -- Descrição para orientar o cliente
+  position INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-ALTER TABLE public.product_units ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.device_qualities ENABLE ROW LEVEL SECURITY;
 
-DROP POLICY IF EXISTS "Leitura pública de unidades disponíveis" ON public.product_units;
-CREATE POLICY "Leitura pública de unidades disponíveis" 
-  ON public.product_units FOR SELECT 
+DROP POLICY IF EXISTS "Leitura pública de qualidades de aparelho" ON public.device_qualities;
+CREATE POLICY "Leitura pública de qualidades de aparelho" 
+  ON public.device_qualities FOR SELECT 
   TO public 
-  USING (status = 'disponivel' OR auth.uid() IN (SELECT user_id FROM public.admins));
+  USING (true);
 
-DROP POLICY IF EXISTS "Apenas admins gerenciam unidades" ON public.product_units;
-CREATE POLICY "Apenas admins gerenciam unidades" 
-  ON public.product_units FOR ALL 
+DROP POLICY IF EXISTS "Apenas admins gerenciam qualidades de aparelho" ON public.device_qualities;
+CREATE POLICY "Apenas admins gerenciam qualidades de aparelho" 
+  ON public.device_qualities FOR ALL 
   TO authenticated 
   USING (auth.uid() IN (SELECT user_id FROM public.admins))
   WITH CHECK (auth.uid() IN (SELECT user_id FROM public.admins));
 
 -- ==========================================================================
--- 6. VIEW INTELIGENTE DO CATÁLOGO (MODELO + MENOR PREÇO + QUANTIDADES)
+-- 6. TABELA DE QUALIDADES DA BATERIA
 -- ==========================================================================
+CREATE TABLE IF NOT EXISTS public.battery_qualities (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  slug TEXT NOT NULL UNIQUE,                         -- 'bat_100', 'bat_90_99', 'bat_81_31c', 'bat_80_89'
+  name TEXT NOT NULL,                                 -- '100% (Zero Ciclos)', '81% · 31 ciclos', '90% a 99%'
+  health_percentage INTEGER CHECK (
+    health_percentage IS NULL OR (health_percentage >= 50 AND health_percentage <= 100)
+  ),
+  cycles_count INTEGER CHECK (
+    cycles_count IS NULL OR cycles_count >= 0
+  ),
+  description TEXT,
+  position INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.battery_qualities ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Leitura pública de qualidades de bateria" ON public.battery_qualities;
+CREATE POLICY "Leitura pública de qualidades de bateria" 
+  ON public.battery_qualities FOR SELECT 
+  TO public 
+  USING (true);
+
+DROP POLICY IF EXISTS "Apenas admins gerenciam qualidades de bateria" ON public.battery_qualities;
+CREATE POLICY "Apenas admins gerenciam qualidades de bateria" 
+  ON public.battery_qualities FOR ALL 
+  TO authenticated 
+  USING (auth.uid() IN (SELECT user_id FROM public.admins))
+  WITH CHECK (auth.uid() IN (SELECT user_id FROM public.admins));
+
+-- ==========================================================================
+-- 7. TABELA RELACIONAL: MODELO X QUALIDADES DISPONÍVEIS (TAGS DE DISPONIBILIDADE)
+-- Guarda quais modelos possuem quais qualidades e tags disponíveis, SEM controle de estoque numérico
+-- ==========================================================================
+CREATE TABLE IF NOT EXISTS public.product_qualities (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  model_id UUID NOT NULL REFERENCES public.product_models(id) ON DELETE CASCADE,
+  device_quality_id UUID NOT NULL REFERENCES public.device_qualities(id) ON DELETE CASCADE,
+  battery_quality_id UUID REFERENCES public.battery_qualities(id) ON DELETE SET NULL, -- Opcional (MacBooks ou novos não exigem tag de bateria)
+  
+  -- Especificações da Tag
+  storage TEXT NOT NULL,                              -- Ex: "128GB", "256GB", "16GB · 512GB"
+  color TEXT NOT NULL,                                -- Ex: "Titânio Natural", "Meia-noite"
+  price NUMERIC CHECK (price IS NULL OR (price >= 50 AND price <= 60000)),
+  
+  -- Flag de Disponibilidade: "Tem ainda" = true, "Esgotado no momento" = false
+  is_available BOOLEAN NOT NULL DEFAULT true,
+  warranty TEXT NOT NULL DEFAULT 'Garantia da Loja',
+  notes TEXT,
+  
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.product_qualities ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Leitura pública de qualidades disponíveis" ON public.product_qualities;
+CREATE POLICY "Leitura pública de qualidades disponíveis" 
+  ON public.product_qualities FOR SELECT 
+  TO public 
+  USING (is_available = true OR auth.uid() IN (SELECT user_id FROM public.admins));
+
+DROP POLICY IF EXISTS "Apenas admins gerenciam relacional de qualidades" ON public.product_qualities;
+CREATE POLICY "Apenas admins gerenciam relacional de qualidades" 
+  ON public.product_qualities FOR ALL 
+  TO authenticated 
+  USING (auth.uid() IN (SELECT user_id FROM public.admins))
+  WITH CHECK (auth.uid() IN (SELECT user_id FROM public.admins));
+
+-- ==========================================================================
+-- 8. VIEWS AUXILIARES PARA O FRONTEND
+-- ==========================================================================
+
+-- 8.1 View de Resumo da Vitrine (Menor Preço e Total de Tags Disponíveis)
 CREATE OR REPLACE VIEW public.v_catalog_showcase AS
 SELECT 
   m.id AS model_id,
@@ -188,17 +229,43 @@ SELECT
   m.category,
   m.default_image_url,
   m.position,
-  MIN(u.price) AS starting_price,
-  COUNT(u.id) FILTER (WHERE u.status = 'disponivel') AS total_units_available,
-  COUNT(u.id) FILTER (WHERE u.status = 'disponivel' AND u.condition = 'novo') AS new_units_count,
-  COUNT(u.id) FILTER (WHERE u.status = 'disponivel' AND u.condition = 'seminovo') AS used_units_count
+  MIN(pq.price) AS starting_price,
+  COUNT(pq.id) FILTER (WHERE pq.is_available = true) AS available_tags_count
 FROM public.product_models m
-LEFT JOIN public.product_units u ON u.model_id = m.id AND u.status = 'disponivel'
+LEFT JOIN public.product_qualities pq ON pq.model_id = m.id AND pq.is_available = true
 WHERE m.active = true
 GROUP BY m.id;
 
+-- 8.2 View com o JOIN Completo das Tags (Modelo + Qualidade do Aparelho + Qualidade da Bateria)
+CREATE OR REPLACE VIEW public.v_product_available_tags AS
+SELECT 
+  pq.id AS tag_id,
+  pq.model_id,
+  m.name AS model_name,
+  m.category,
+  pq.storage,
+  pq.color,
+  pq.price,
+  pq.is_available,
+  pq.warranty,
+  dq.id AS device_quality_id,
+  dq.slug AS device_quality_slug,
+  dq.name AS device_quality_name,
+  dq.badge_label AS device_quality_badge,
+  bq.id AS battery_quality_id,
+  bq.slug AS battery_quality_slug,
+  bq.name AS battery_quality_name,
+  bq.health_percentage AS battery_health,
+  bq.cycles_count AS battery_cycles
+FROM public.product_qualities pq
+JOIN public.product_models m ON m.id = pq.model_id
+JOIN public.device_qualities dq ON dq.id = pq.device_quality_id
+LEFT JOIN public.battery_qualities bq ON bq.id = pq.battery_quality_id
+WHERE pq.is_available = true AND m.active = true
+ORDER BY pq.price ASC NULLS LAST;
+
 -- ==========================================================================
--- 7. TABELA DE AVALIAÇÕES / DEPOIMENTOS DE CLIENTES
+-- 9. TABELA DE AVALIAÇÕES / DEPOIMENTOS DE CLIENTES
 -- ==========================================================================
 CREATE TABLE IF NOT EXISTS public.reviews (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -227,10 +294,10 @@ CREATE POLICY "Apenas admins gerenciam reviews"
   WITH CHECK (auth.uid() IN (SELECT user_id FROM public.admins));
 
 -- ==========================================================================
--- 8. SEED AUTOMÁTICO COMPLETO (DADOS REAIS COM AS 2 MECÂNICAS)
+-- 10. SEED AUTOMÁTICO COMPLETO (POPULAÇÃO COM DADOS REAIS DA LL IMPORTS)
 -- ==========================================================================
 
--- 8.1 Configurações da Loja
+-- 10.1 Configurações da Loja
 INSERT INTO public.site_settings (key, value)
 VALUES 
   ('general', '{
@@ -256,7 +323,7 @@ VALUES
   }'::jsonb)
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value;
 
--- 8.2 Seções da Landing Page
+-- 10.2 Seções da Landing Page
 INSERT INTO public.sections (key, title, subtitle, content, visible, position)
 VALUES
   ('hero', 'O Apple dos seus sonhos', 'com a exclusividade que você merece.', '{
@@ -361,7 +428,7 @@ ON CONFLICT (key) DO UPDATE SET
   visible = EXCLUDED.visible,
   position = EXCLUDED.position;
 
--- 8.3 Avaliações Reais de Clientes (Google Reviews)
+-- 10.3 Avaliações Reais de Clientes (Google Reviews)
 DELETE FROM public.reviews;
 INSERT INTO public.reviews (name, badge, stars, text, position)
 VALUES
@@ -369,11 +436,31 @@ VALUES
   ('Rita Pacheco', 'Local Guide Google', 5, 'Fui até a loja por indicação de duas amigas e não me arrependi! Atendimento personalizado e encontramos o modelo de celular perfeito funcionando bem! Oferecem acessórios também! Recomendo!', 2),
   ('Lucas K.', 'Cliente Verificado', 5, 'Comprei um MacBook Air M4 e o atendimento superou qualquer loja oficial. Preço muito mais justo, peguei em mãos na sala no Cabral no mesmo dia. Nota 10!', 3);
 
--- 8.4 Modelos de Catálogo (Mecânica 1) e Unidades em Estoque (Mecânica 2)
-DELETE FROM public.product_units;
+-- 10.4 Limpeza e População das Tabelas de Modelos e Qualidades
+DELETE FROM public.product_qualities;
+DELETE FROM public.battery_qualities;
+DELETE FROM public.device_qualities;
 DELETE FROM public.product_models;
 
--- Modelos
+-- TABELA: QUALIDADES DO APARELHO (CONDIÇÃO ESTÉTICA)
+INSERT INTO public.device_qualities (id, slug, name, badge_label, description, position)
+VALUES
+  ('11111111-0000-0000-0000-000000000001', 'novo_lacrado', 'Novo Lacrado', 'Lacrado', 'Aparelho na caixa lacrada de fábrica com 1 ano de garantia Apple', 1),
+  ('11111111-0000-0000-0000-000000000002', 'excelente', 'Excelente (Grade A+)', 'Grade A+', 'Estado impecável como novo, sem marcas ou riscos perceptíveis', 2),
+  ('11111111-0000-0000-0000-000000000003', 'muito_bom', 'Muito Bom (Grade A)', 'Grade A', 'Aparelho em excelente estado estético com sinais mínimos quase imperceptíveis', 3),
+  ('11111111-0000-0000-0000-000000000004', 'usado', 'Usado (Grade B)', 'Grade B', 'Sinais normais de uso na carcaça, 100% testado e funcional com garantia', 4);
+
+-- TABELA: QUALIDADES DA BATERIA
+INSERT INTO public.battery_qualities (id, slug, name, health_percentage, cycles_count, description, position)
+VALUES
+  ('22222222-0000-0000-0000-000000000001', 'bat_100', '100% (Zero Ciclos)', 100, 0, 'Bateria 100% original e sem ciclos', 1),
+  ('22222222-0000-0000-0000-000000000002', 'bat_94_98c', '94% · 98 ciclos', 94, 98, 'Saúde em 94% com apenas 98 ciclos', 2),
+  ('22222222-0000-0000-0000-000000000003', 'bat_89_142c', '89% · 142 ciclos', 89, 142, 'Saúde em 89% com 142 ciclos originais', 3),
+  ('22222222-0000-0000-0000-000000000004', 'bat_81_31c', '81% · 31 ciclos', 81, 31, 'Saúde em 81% com apenas 31 ciclos', 4),
+  ('22222222-0000-0000-0000-000000000005', 'bat_85_260c', '85% · 260 ciclos', 85, 260, 'Saúde em 85% com 260 ciclos', 5),
+  ('22222222-0000-0000-0000-000000000006', 'bat_98_45c', '98% · 45 ciclos', 98, 45, 'MacBook com 98% e apenas 45 ciclos', 6);
+
+-- TABELA: MODELOS DE APARELHO
 INSERT INTO public.product_models (id, name, category, default_image_url, active, position)
 VALUES
   ('00000000-0000-0000-0000-000000000001', 'iPhone 17 Pro Max', 'iphone', NULL, true, 1),
@@ -386,39 +473,32 @@ VALUES
   ('00000000-0000-0000-0000-000000000008', 'iPad Pro M4', 'ipad', NULL, true, 8),
   ('00000000-0000-0000-0000-000000000009', 'Apple Watch Ultra 2', 'watch', NULL, true, 9);
 
--- Unidades com Bateria, Ciclos e Condição Estética
-INSERT INTO public.product_units (model_id, condition, aesthetic_grade, battery_health, battery_cycles, storage, color, price, status, warranty, notes)
+-- TABELA RELACIONAL: MODELO X QUALIDADES DISPONÍVEIS (TAGS DE DISPONIBILIDADE)
+-- Associa cada modelo às qualidades que estão disponíveis para ele no momento (SEM controle de estoque)
+INSERT INTO public.product_qualities (model_id, device_quality_id, battery_quality_id, storage, color, price, is_available, warranty, notes)
 VALUES
-  -- iPhone 17 Pro Max (Novo)
-  ('00000000-0000-0000-0000-000000000001', 'novo', 'novo_lacrado', 100, 0, '256GB', 'Laranja Cósmico', 7599.00, 'disponivel', '1 ano Apple', 'Novo lacrado de fábrica com nota fiscal'),
-  ('00000000-0000-0000-0000-000000000001', 'novo', 'novo_lacrado', 100, 0, '512GB', 'Azul Profundo', 8399.00, 'disponivel', '1 ano Apple', 'Novo lacrado de fábrica'),
+  -- iPhone 17 Pro Max (Novo Lacrado - 100% Bateria)
+  ('00000000-0000-0000-0000-000000000001', '11111111-0000-0000-0000-000000000001', '22222222-0000-0000-0000-000000000001', '256GB', 'Laranja Cósmico', 7599.00, true, '1 ano Apple', 'Novo lacrado com NF-e'),
+  ('00000000-0000-0000-0000-000000000001', '11111111-0000-0000-0000-000000000001', '22222222-0000-0000-0000-000000000001', '512GB', 'Azul Profundo', 8399.00, true, '1 ano Apple', 'Novo lacrado'),
 
-  -- iPhone 17 Pro (Novo)
-  ('00000000-0000-0000-0000-000000000002', 'novo', 'novo_lacrado', 100, 0, '256GB', 'Prata', 7199.00, 'disponivel', '1 ano Apple', 'Novo lacrado'),
+  -- iPhone 17 Pro (Novo Lacrado)
+  ('00000000-0000-0000-0000-000000000002', '11111111-0000-0000-0000-000000000001', '22222222-0000-0000-0000-000000000001', '256GB', 'Prata', 7199.00, true, '1 ano Apple', 'Novo lacrado'),
 
-  -- iPhone 16 Pro Max (Seminovo Excelente)
-  ('00000000-0000-0000-0000-000000000003', 'seminovo', 'excelente', 89, 142, '256GB', 'Titânio Natural', 5899.00, 'disponivel', 'Garantia da Loja', 'Impecável, sem detalhes, bateria original em 89% com 142 ciclos'),
+  -- iPhone 16 Pro Max (Seminovo Excelente - 89% Bateria)
+  ('00000000-0000-0000-0000-000000000003', '11111111-0000-0000-0000-000000000002', '22222222-0000-0000-0000-000000000003', '256GB', 'Titânio Natural', 5899.00, true, 'Garantia da Loja', 'Aparelho Grade A+ impecável'),
 
-  -- iPhone 15 Pro (Seminovo Muito Bom com 81% e 31 ciclos como solicitado)
-  ('00000000-0000-0000-0000-000000000004', 'seminovo', 'muito_bom', 81, 31, '128GB', 'Titânio Preto', 4299.00, 'disponivel', 'Garantia da Loja', 'Aparelho revisado, mínimas marcas de uso, bateria com 81% e apenas 31 ciclos'),
-  ('00000000-0000-0000-0000-000000000004', 'seminovo', 'excelente', 94, 98, '256GB', 'Titânio Azul', 4699.00, 'disponivel', 'Garantia da Loja', 'Estado impecável de conservação, bateria 94% com 98 ciclos'),
+  -- iPhone 15 Pro (MUITO BOM COM 81% E 31 CICLOS + EXCELENTE COM 94%)
+  ('00000000-0000-0000-0000-000000000004', '11111111-0000-0000-0000-000000000003', '22222222-0000-0000-0000-000000000004', '128GB', 'Titânio Preto', 4299.00, true, 'Garantia da Loja', 'Muito Bom com bateria 81% e 31 ciclos'),
+  ('00000000-0000-0000-0000-000000000004', '11111111-0000-0000-0000-000000000002', '22222222-0000-0000-0000-000000000002', '256GB', 'Titânio Azul', 4699.00, true, 'Garantia da Loja', 'Excelente Grade A+ com bateria 94%'),
 
-  -- iPhone 13 Pro (Seminovo Bom/Usado)
-  ('00000000-0000-0000-0000-000000000005', 'seminovo', 'bom_usado', 85, 260, '128GB', 'Grafite', 2999.00, 'disponivel', 'Garantia da Loja', 'Aparelho 100% funcional com pequenas marcas de uso na borda'),
+  -- iPhone 13 Pro (Usado Grade B - 85% Bateria)
+  ('00000000-0000-0000-0000-000000000005', '11111111-0000-0000-0000-000000000004', '22222222-0000-0000-0000-000000000005', '128GB', 'Grafite', 2999.00, true, 'Garantia da Loja', 'Usado 100% revisado com garantia'),
 
-  -- MacBook Air 13″ M4 (Novo)
-  ('00000000-0000-0000-0000-000000000006', 'novo', 'novo_lacrado', 100, 0, '16GB · 256GB', 'Meia-noite', 9999.00, 'disponivel', '1 ano Apple', 'Lacrado com teclado padrão Apple e 1 ano de garantia'),
+  -- MacBook Air 13″ M4 (Novo Lacrado)
+  ('00000000-0000-0000-0000-000000000006', '11111111-0000-0000-0000-000000000001', '22222222-0000-0000-0000-000000000001', '16GB · 256GB', 'Meia-noite', 9999.00, true, '1 ano Apple', 'Caixa lacrada'),
 
-  -- MacBook Pro 14″ M3 Pro (Seminovo Excelente com ciclos de bateria)
-  ('00000000-0000-0000-0000-000000000007', 'seminovo', 'excelente', 98, 45, '18GB · 512GB', 'Preto Espacial', 12499.00, 'disponivel', 'Garantia da Loja', 'Bateria com 98% e apenas 45 ciclos. Acompanha carregador MagSafe original'),
+  -- MacBook Pro 14″ M3 Pro (Seminovo Excelente - 98% Bateria e 45 ciclos)
+  ('00000000-0000-0000-0000-000000000007', '11111111-0000-0000-0000-000000000002', '22222222-0000-0000-0000-000000000006', '18GB · 512GB', 'Preto Espacial', 12499.00, true, 'Garantia da Loja', 'Bateria 98% e 45 ciclos com MagSafe'),
 
-  -- Apple Watch Ultra 2 (Novo)
-  ('00000000-0000-0000-0000-000000000009', 'novo', 'novo_lacrado', 100, 0, '49 mm', 'Titânio Natural', 5499.00, 'disponivel', '1 ano Apple', 'Caixa lacrada');
-
--- ==========================================================================
--- 9. COMO VINCULAR SEU USUÁRIO COMO ADMINISTRADOR
--- ==========================================================================
--- Após criar um usuário no Supabase Auth:
--- INSERT INTO public.admins (user_id, email)
--- SELECT id, email FROM auth.users WHERE email = 'seu_email@exemplo.com'
--- ON CONFLICT (user_id) DO NOTHING;
+  -- Apple Watch Ultra 2 (Novo Lacrado)
+  ('00000000-0000-0000-0000-000000000009', '11111111-0000-0000-0000-000000000001', '22222222-0000-0000-0000-000000000001', '49 mm', 'Titânio Natural', 5499.00, true, '1 ano Apple', 'Lacrado');

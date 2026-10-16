@@ -8,6 +8,8 @@ export const site = seed.site
 export const nav = seed.nav
 export const sections = [...seed.sections].sort((a, b) => a.position - b.position)
 export const categories = seed.categories
+export const deviceQualities = seed.device_qualities || []
+export const batteryQualities = seed.battery_qualities || []
 export const allProducts = [...seed.products].sort((a, b) => a.position - b.position)
 export const products = allProducts.filter((p) => p.active)
 

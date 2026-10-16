@@ -188,6 +188,22 @@
     { "key": "acessorios", "label": "Acessórios" }
   ],
 
+  "device_qualities": [
+    { "id": "qual_novo", "slug": "novo_lacrado", "name": "Novo Lacrado", "badge": "Lacrado", "description": "Caixa lacrada de fábrica com 1 ano oficial Apple" },
+    { "id": "qual_excelente", "slug": "excelente", "name": "Excelente (Grade A+)", "badge": "Grade A+", "description": "Sem marcas de uso, estado impecável como novo" },
+    { "id": "qual_muito_bom", "slug": "muito_bom", "name": "Muito Bom (Grade A)", "badge": "Grade A", "description": "Mínimos sinais de uso quase imperceptíveis" },
+    { "id": "qual_usado", "slug": "usado", "name": "Usado (Grade B)", "badge": "Grade B", "description": "Sinais normais de uso, 100% testado e funcional" }
+  ],
+
+  "battery_qualities": [
+    { "id": "bat_100", "slug": "bat_100", "name": "100% (Zero Ciclos)", "health": 100, "cycles": 0 },
+    { "id": "bat_94_98c", "slug": "bat_94_98c", "name": "94% · 98 ciclos", "health": 94, "cycles": 98 },
+    { "id": "bat_89_142c", "slug": "bat_89_142c", "name": "89% · 142 ciclos", "health": 89, "cycles": 142 },
+    { "id": "bat_81_31c", "slug": "bat_81_31c", "name": "81% · 31 ciclos", "health": 81, "cycles": 31 },
+    { "id": "bat_85_260c", "slug": "bat_85_260c", "name": "85% · 260 ciclos", "health": 85, "cycles": 260 },
+    { "id": "bat_98_45c", "slug": "bat_98_45c", "name": "98% · 45 ciclos", "health": 98, "cycles": 45 }
+  ],
+
   "products": [
     {
       "id": "ip17pm",
@@ -202,29 +218,33 @@
       "featured": true,
       "active": true,
       "position": 1,
-      "units": [
+      "tags": [
         {
-          "id": "u_17pm_1",
-          "condition": "novo",
-          "aesthetic_grade": "novo_lacrado",
+          "id": "tag_17pm_1",
+          "device_quality_slug": "novo_lacrado",
+          "device_quality_name": "Novo Lacrado",
+          "battery_quality_slug": "bat_100",
+          "battery_quality_name": "100% (Zero Ciclos)",
           "battery_health": 100,
           "battery_cycles": 0,
           "storage": "256GB",
           "color": "Laranja Cósmico",
           "price": 7599,
-          "status": "disponivel",
+          "is_available": true,
           "warranty": "1 ano Apple"
         },
         {
-          "id": "u_17pm_2",
-          "condition": "novo",
-          "aesthetic_grade": "novo_lacrado",
+          "id": "tag_17pm_2",
+          "device_quality_slug": "novo_lacrado",
+          "device_quality_name": "Novo Lacrado",
+          "battery_quality_slug": "bat_100",
+          "battery_quality_name": "100% (Zero Ciclos)",
           "battery_health": 100,
           "battery_cycles": 0,
           "storage": "512GB",
           "color": "Azul Profundo",
           "price": 8399,
-          "status": "disponivel",
+          "is_available": true,
           "warranty": "1 ano Apple"
         }
       ]
@@ -242,17 +262,19 @@
       "featured": false,
       "active": true,
       "position": 2,
-      "units": [
+      "tags": [
         {
-          "id": "u_17p_1",
-          "condition": "novo",
-          "aesthetic_grade": "novo_lacrado",
+          "id": "tag_17p_1",
+          "device_quality_slug": "novo_lacrado",
+          "device_quality_name": "Novo Lacrado",
+          "battery_quality_slug": "bat_100",
+          "battery_quality_name": "100% (Zero Ciclos)",
           "battery_health": 100,
           "battery_cycles": 0,
           "storage": "256GB",
           "color": "Prata",
           "price": 7199,
-          "status": "disponivel",
+          "is_available": true,
           "warranty": "1 ano Apple"
         }
       ]
@@ -270,17 +292,19 @@
       "featured": false,
       "active": true,
       "position": 3,
-      "units": [
+      "tags": [
         {
-          "id": "u_16pm_1",
-          "condition": "seminovo",
-          "aesthetic_grade": "excelente",
+          "id": "tag_16pm_1",
+          "device_quality_slug": "excelente",
+          "device_quality_name": "Excelente (Grade A+)",
+          "battery_quality_slug": "bat_89_142c",
+          "battery_quality_name": "89% · 142 ciclos",
           "battery_health": 89,
           "battery_cycles": 142,
           "storage": "256GB",
           "color": "Titânio Natural",
           "price": 5899,
-          "status": "disponivel",
+          "is_available": true,
           "warranty": "Garantia da Loja"
         }
       ]
@@ -298,29 +322,33 @@
       "featured": false,
       "active": true,
       "position": 4,
-      "units": [
+      "tags": [
         {
-          "id": "u_15p_1",
-          "condition": "seminovo",
-          "aesthetic_grade": "muito_bom",
+          "id": "tag_15p_1",
+          "device_quality_slug": "muito_bom",
+          "device_quality_name": "Muito Bom (Grade A)",
+          "battery_quality_slug": "bat_81_31c",
+          "battery_quality_name": "81% · 31 ciclos",
           "battery_health": 81,
           "battery_cycles": 31,
           "storage": "128GB",
           "color": "Titânio Preto",
           "price": 4299,
-          "status": "disponivel",
+          "is_available": true,
           "warranty": "Garantia da Loja"
         },
         {
-          "id": "u_15p_2",
-          "condition": "seminovo",
-          "aesthetic_grade": "excelente",
+          "id": "tag_15p_2",
+          "device_quality_slug": "excelente",
+          "device_quality_name": "Excelente (Grade A+)",
+          "battery_quality_slug": "bat_94_98c",
+          "battery_quality_name": "94% · 98 ciclos",
           "battery_health": 94,
           "battery_cycles": 98,
           "storage": "256GB",
           "color": "Titânio Azul",
           "price": 4699,
-          "status": "disponivel",
+          "is_available": true,
           "warranty": "Garantia da Loja"
         }
       ]
@@ -338,22 +366,23 @@
       "featured": false,
       "active": true,
       "position": 5,
-      "units": [
+      "tags": [
         {
-          "id": "u_13p_1",
-          "condition": "seminovo",
-          "aesthetic_grade": "bom_usado",
+          "id": "tag_13p_1",
+          "device_quality_slug": "usado",
+          "device_quality_name": "Usado (Grade B)",
+          "battery_quality_slug": "bat_85_260c",
+          "battery_quality_name": "85% · 260 ciclos",
           "battery_health": 85,
           "battery_cycles": 260,
           "storage": "128GB",
           "color": "Grafite",
           "price": 2999,
-          "status": "disponivel",
+          "is_available": true,
           "warranty": "Garantia da Loja"
         }
       ]
     },
-
     {
       "id": "mba13m4",
       "name": "MacBook Air 13″ M4",
@@ -367,17 +396,19 @@
       "featured": false,
       "active": true,
       "position": 6,
-      "units": [
+      "tags": [
         {
-          "id": "u_mba13_1",
-          "condition": "novo",
-          "aesthetic_grade": "novo_lacrado",
+          "id": "tag_mba13_1",
+          "device_quality_slug": "novo_lacrado",
+          "device_quality_name": "Novo Lacrado",
+          "battery_quality_slug": "bat_100",
+          "battery_quality_name": "100% (Zero Ciclos)",
           "battery_health": 100,
           "battery_cycles": 0,
           "storage": "16GB · 256GB",
           "color": "Meia-noite",
           "price": 9999,
-          "status": "disponivel",
+          "is_available": true,
           "warranty": "1 ano Apple"
         }
       ]
@@ -395,17 +426,19 @@
       "featured": false,
       "active": true,
       "position": 7,
-      "units": [
+      "tags": [
         {
-          "id": "u_mbp14_1",
-          "condition": "seminovo",
-          "aesthetic_grade": "excelente",
+          "id": "tag_mbp14_1",
+          "device_quality_slug": "excelente",
+          "device_quality_name": "Excelente (Grade A+)",
+          "battery_quality_slug": "bat_98_45c",
+          "battery_quality_name": "98% · 45 ciclos",
           "battery_health": 98,
           "battery_cycles": 45,
           "storage": "18GB · 512GB",
           "color": "Preto Espacial",
           "price": 12499,
-          "status": "disponivel",
+          "is_available": true,
           "warranty": "Garantia da Loja"
         }
       ]
@@ -423,7 +456,7 @@
       "featured": false,
       "active": true,
       "position": 8,
-      "units": []
+      "tags": []
     },
     {
       "id": "watchultra",
@@ -438,17 +471,19 @@
       "featured": false,
       "active": true,
       "position": 9,
-      "units": [
+      "tags": [
         {
-          "id": "u_wu2_1",
-          "condition": "novo",
-          "aesthetic_grade": "novo_lacrado",
+          "id": "tag_wu2_1",
+          "device_quality_slug": "novo_lacrado",
+          "device_quality_name": "Novo Lacrado",
+          "battery_quality_slug": "bat_100",
+          "battery_quality_name": "100% (Zero Ciclos)",
           "battery_health": 100,
           "battery_cycles": 0,
           "storage": "49 mm",
           "color": "Titânio Natural",
           "price": 5499,
-          "status": "disponivel",
+          "is_available": true,
           "warranty": "1 ano Apple"
         }
       ]

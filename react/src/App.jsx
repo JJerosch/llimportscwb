@@ -25,7 +25,7 @@ export default function App() {
   const reviews = getSection(sections, 'reviews')
   const faq = getSection(sections, 'faq')
 
-  // Mecânica 1: Modelos
+  // Mecânica 1: Modelos de Aparelho
   const handleAddProduct = (newProd) => {
     setProducts((prev) => [newProd, ...prev])
   }
@@ -46,43 +46,54 @@ export default function App() {
     )
   }
 
-  // Mecânica 2: Unidades em Estoque
-  const handleAddUnit = (modelId, newUnit) => {
+  // Mecânica 2: Tags de Qualidades Relacionais (sem controle de estoque numérico)
+  const handleAddTag = (modelId, newTag) => {
     setProducts((prev) =>
       prev.map((p) => {
         if (p.id !== modelId) return p
-        const currentUnits = p.units || []
+        const currentTags = p.tags || p.units || []
         return {
           ...p,
-          units: [newUnit, ...currentUnits]
+          tags: [newTag, ...currentTags],
+          units: [newTag, ...currentTags]
         }
       })
     )
   }
 
-  const handleToggleUnitStatus = (modelId, unitId) => {
+  const handleToggleTagAvailability = (modelId, tagId) => {
     setProducts((prev) =>
       prev.map((p) => {
         if (p.id !== modelId) return p
+        const currentTags = p.tags || p.units || []
+        const updated = currentTags.map((t) =>
+          t.id === tagId
+            ? {
+                ...t,
+                is_available: t.is_available === false ? true : false,
+                status: t.status === 'disponivel' ? 'vendido' : 'disponivel'
+              }
+            : t
+        )
         return {
           ...p,
-          units: (p.units || []).map((u) =>
-            u.id === unitId
-              ? { ...u, status: u.status === 'disponivel' ? 'vendido' : 'disponivel' }
-              : u
-          )
+          tags: updated,
+          units: updated
         }
       })
     )
   }
 
-  const handleDeleteUnit = (modelId, unitId) => {
+  const handleDeleteTag = (modelId, tagId) => {
     setProducts((prev) =>
       prev.map((p) => {
         if (p.id !== modelId) return p
+        const currentTags = p.tags || p.units || []
+        const filtered = currentTags.filter((t) => t.id !== tagId)
         return {
           ...p,
-          units: (p.units || []).filter((u) => u.id !== unitId)
+          tags: filtered,
+          units: filtered
         }
       })
     )
@@ -116,9 +127,9 @@ export default function App() {
         onToggleModelActive={handleToggleModelActive}
         onDeleteProduct={handleDeleteProduct}
         onUpdatePrice={handleUpdatePrice}
-        onAddUnit={handleAddUnit}
-        onToggleUnitStatus={handleToggleUnitStatus}
-        onDeleteUnit={handleDeleteUnit}
+        onAddTag={handleAddTag}
+        onToggleTagAvailability={handleToggleTagAvailability}
+        onDeleteTag={handleDeleteTag}
         sections={sections}
         onToggleSection={handleToggleSection}
       />

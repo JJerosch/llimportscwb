@@ -4,10 +4,10 @@
       <div className="section-head">
         <span className="section-head__tag">Catálogo Inteligente</span>
         <h2 id="catalog-title" className="section-head__title">
-          Modelos Selecionados & Pronta Entrega
+          Modelos & Qualidades Disponíveis
         </h2>
         <p className="section-head__subtitle">
-          Consulte a cotação oficial do dia ou escolha entre aparelhos lacrados e seminovos com laudo de bateria e grau estético detalhado.
+          Consulte os modelos disponíveis no showroom com tags claras de qualidade do aparelho e saúde de bateria.
         </p>
       </div>
 
@@ -62,10 +62,10 @@
             <span
               :class="[
                 'product-badge',
-                getCondition(prod) === 'novo' ? 'product-badge--novo' : 'product-badge--seminovo'
+                isNovo(prod) ? 'product-badge--novo' : 'product-badge--seminovo'
               ]"
             >
-              {{ prod.badge || (getCondition(prod) === 'novo' ? 'Lacrado' : 'Seminovo') }}
+              {{ isNovo(prod) ? 'Novo Lacrado' : (getDeviceQualityName(prod) || 'Seminovo') }}
             </span>
             <span className="product-warranty">{{ getWarranty(prod) }}</span>
           </div>
@@ -88,33 +88,33 @@
           <div className="product-card__body">
             <h3 className="product-card__name">{{ prod.name }}</h3>
 
-            <!-- Badges de Bateria e Grau Estético -->
+            <!-- Badges de Qualidade do Aparelho & Qualidade da Bateria -->
             <div className="product-card__meta-bar">
               <span
-                v-if="getAesthetic(prod)"
-                :class="['grade-badge', `grade-badge--${getAesthetic(prod)}`]"
+                v-if="getDeviceQualitySlug(prod)"
+                :class="['grade-badge', `grade-badge--${getDeviceQualitySlug(prod)}`]"
               >
-                ✨ {{ formatAestheticGrade(getAesthetic(prod)) }}
+                ✨ {{ getDeviceQualityName(prod) }}
               </span>
 
               <span
-                v-if="getBattery(prod)"
+                v-if="getBatteryLabel(prod)"
                 :class="[
                   'battery-badge',
-                  (getActiveUnit(prod)?.battery_health || 100) >= 90
+                  (getActiveTag(prod)?.battery_health || 100) >= 90
                     ? 'battery-badge--good'
                     : 'battery-badge--medium'
                 ]"
               >
-                🔋 {{ getBattery(prod) }}
+                🔋 {{ getBatteryLabel(prod) }}
               </span>
             </div>
 
-            <!-- Tags gerais ou da unidade -->
+            <!-- Tags gerais ou da opção selecionada -->
             <div className="product-card__tags">
-              <template v-if="getActiveUnit(prod)">
-                <span className="tag-spec">{{ getActiveUnit(prod).storage }}</span>
-                <span className="tag-spec">{{ getActiveUnit(prod).color }}</span>
+              <template v-if="getActiveTag(prod)">
+                <span className="tag-spec">{{ getActiveTag(prod).storage }}</span>
+                <span className="tag-spec">{{ getActiveTag(prod).color }}</span>
               </template>
               <template v-else>
                 <span v-for="st in prod.storage" :key="st" className="tag-spec">{{ st }}</span>
@@ -122,36 +122,36 @@
               </template>
             </div>
 
-            <!-- Seletor de unidades se houver mais de uma disponível -->
+            <!-- Seletor de Qualidades/Tags disponíveis -->
             <div
-              v-if="getAvailableUnits(prod).length > 1"
+              v-if="getAvailableTags(prod).length > 1"
               className="product-card__units-box"
             >
               <div className="product-card__units-header">
-                <span>Unidades Disponíveis ({{ getAvailableUnits(prod).length }})</span>
+                <span>Qualidades Disponíveis ({{ getAvailableTags(prod).length }})</span>
                 <span>Selecione a opção</span>
               </div>
               <div className="unit-chips">
                 <button
-                  v-for="u in getAvailableUnits(prod)"
-                  :key="u.id"
+                  v-for="t in getAvailableTags(prod)"
+                  :key="t.id"
                   type="button"
-                  :class="['unit-chip', { 'is-active': u.id === getActiveUnit(prod)?.id }]"
-                  @click="selectUnit(prod.id, u.id)"
+                  :class="['unit-chip', { 'is-active': t.id === getActiveTag(prod)?.id }]"
+                  @click="selectTag(prod.id, t.id)"
                 >
                   <div className="unit-chip__main">
                     <span className="unit-chip__name">
-                      {{ u.storage }} · {{ u.color }}
+                      {{ t.storage }} · {{ t.color }}
                     </span>
                     <span className="unit-chip__sub">
-                      {{ formatAestheticGrade(u.aesthetic_grade) }}
-                      <template v-if="u.battery_health">
-                        · 🔋 {{ u.battery_health }}% ({{ u.battery_cycles || 0 }}c)
+                      {{ t.device_quality_name || formatAestheticGrade(t.device_quality_slug || t.aesthetic_grade) }}
+                      <template v-if="t.battery_quality_name || t.battery_health">
+                        · 🔋 {{ t.battery_quality_name || `${t.battery_health}%` }}
                       </template>
                     </span>
                   </div>
                   <span className="unit-chip__price">
-                    {{ formatPrice(u.price) }}
+                    {{ formatPrice(t.price) }}
                   </span>
                 </button>
               </div>
@@ -201,7 +201,7 @@ const props = defineProps({
 
 const selectedCat = ref('all')
 const selectedCond = ref('all')
-const selectedUnits = ref({})
+const selectedTags = ref({})
 
 const allActiveProducts = computed(() => {
   return (props.products || defaultProducts).filter((p) => p.active !== false)
@@ -215,54 +215,63 @@ const filtered = computed(() => {
   })
 })
 
-const getAvailableUnits = (prod) => {
-  return (prod.units || []).filter((u) => u.status === 'disponivel')
+const getAvailableTags = (prod) => {
+  const raw = prod.tags || prod.units || []
+  return raw.filter((t) => t.is_available !== false && t.status !== 'vendido')
 }
 
-const getActiveUnit = (prod) => {
-  const units = getAvailableUnits(prod)
-  const id = selectedUnits.value[prod.id]
-  return units.find((u) => u.id === id) || units[0] || null
+const getActiveTag = (prod) => {
+  const tags = getAvailableTags(prod)
+  const id = selectedTags.value[prod.id]
+  return tags.find((t) => t.id === id) || tags[0] || null
 }
 
-const selectUnit = (prodId, unitId) => {
-  selectedUnits.value[prodId] = unitId
+const selectTag = (prodId, tagId) => {
+  selectedTags.value[prodId] = tagId
 }
 
-const getCondition = (prod) => {
-  const u = getActiveUnit(prod)
-  return u ? u.condition : prod.condition
+const getDeviceQualitySlug = (prod) => {
+  const t = getActiveTag(prod)
+  return t ? (t.device_quality_slug || t.aesthetic_grade) : null
+}
+
+const getDeviceQualityName = (prod) => {
+  const t = getActiveTag(prod)
+  if (!t) return null
+  return t.device_quality_name || formatAestheticGrade(t.device_quality_slug || t.aesthetic_grade)
+}
+
+const isNovo = (prod) => {
+  const slug = getDeviceQualitySlug(prod)
+  return slug === 'novo_lacrado' || prod.condition === 'novo'
+}
+
+const getBatteryLabel = (prod) => {
+  const t = getActiveTag(prod)
+  if (!t) return null
+  return t.battery_quality_name || formatBattery(t.battery_health, t.battery_cycles)
 }
 
 const getWarranty = (prod) => {
-  const u = getActiveUnit(prod)
-  return u?.warranty || prod.warranty
-}
-
-const getAesthetic = (prod) => {
-  const u = getActiveUnit(prod)
-  return u ? u.aesthetic_grade : null
-}
-
-const getBattery = (prod) => {
-  const u = getActiveUnit(prod)
-  return u ? formatBattery(u.battery_health, u.battery_cycles) : null
+  const t = getActiveTag(prod)
+  return t?.warranty || prod.warranty
 }
 
 const getPrice = (prod) => {
-  const u = getActiveUnit(prod)
-  return u ? u.price : prod.price
+  const t = getActiveTag(prod)
+  return t ? t.price : prod.price
 }
 
 const getWhatsAppLink = (prod) => {
-  const u = getActiveUnit(prod)
+  const t = getActiveTag(prod)
   let msg = ''
-  if (u) {
-    const condLabel = u.condition === 'novo' ? 'Novo Lacrado' : `Seminovo (${formatAestheticGrade(u.aesthetic_grade)})`
-    const batt = formatBattery(u.battery_health, u.battery_cycles)
-    const battLabel = batt ? ` com ${batt}` : ''
-    const price = u.price ? ` por ${formatPrice(u.price)}` : ''
-    msg = `Olá! Vi no catálogo da LL Imports o ${prod.name} (${condLabel}), ${u.storage} na cor ${u.color}${battLabel}${price}. Gostaria de confirmar a retirada no showroom!`
+  if (t) {
+    const devName = t.device_quality_name || formatAestheticGrade(t.device_quality_slug || t.aesthetic_grade)
+    const qualityText = devName ? ` (${devName})` : ''
+    const batt = t.battery_quality_name || formatBattery(t.battery_health, t.battery_cycles)
+    const batteryText = batt ? ` com ${batt}` : ''
+    const price = t.price ? ` por ${formatPrice(t.price)}` : ''
+    msg = `Olá! Vi no catálogo da LL Imports o ${prod.name}${qualityText}, ${t.storage} na cor ${t.color}${batteryText}${price}. Gostaria de confirmar disponibilidade no showroom!`
   } else {
     msg = `Olá! Gostaria de consultar a cotação e cores disponíveis para o ${prod.name} (${prod.condition === 'novo' ? 'Lacrado' : 'Seminovo'}).`
   }

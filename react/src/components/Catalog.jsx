@@ -7,7 +7,7 @@ import WhatsAppIcon from './WhatsAppIcon.jsx'
 export default function Catalog({ products: propProducts }) {
   const [selectedCat, setSelectedCat] = useState('all')
   const [selectedCond, setSelectedCond] = useState('all')
-  const [selectedUnits, setSelectedUnits] = useState({})
+  const [selectedTags, setSelectedTags] = useState({})
 
   const allActiveProducts = (propProducts || defaultProducts).filter((p) => p.active !== false)
 
@@ -23,10 +23,10 @@ export default function Catalog({ products: propProducts }) {
         <div className="section-head">
           <span className="section-head__tag">Catálogo Inteligente</span>
           <h2 id="catalog-title" className="section-head__title">
-            Modelos Selecionados & Pronta Entrega
+            Modelos & Qualidades Disponíveis
           </h2>
           <p className="section-head__subtitle">
-            Consulte a cotação oficial do dia ou escolha entre aparelhos lacrados e seminovos com laudo de bateria e grau estético detalhado.
+            Consulte os modelos disponíveis no showroom com tags claras de qualidade do aparelho e saúde de bateria.
           </p>
         </div>
 
@@ -78,24 +78,27 @@ export default function Catalog({ products: propProducts }) {
 
         <div className="catalog-grid">
           {filtered.map((prod) => {
-            const availableUnits = (prod.units || []).filter((u) => u.status === 'disponivel')
-            const selectedUnitId = selectedUnits[prod.id]
-            const activeUnit = availableUnits.find((u) => u.id === selectedUnitId) || availableUnits[0] || null
+            const rawTags = prod.tags || prod.units || []
+            const availableTags = rawTags.filter((t) => t.is_available !== false && t.status !== 'vendido')
+            const selectedTagId = selectedTags[prod.id]
+            const activeTag = availableTags.find((t) => t.id === selectedTagId) || availableTags[0] || null
 
-            // Dados da unidade ativa ou do modelo base
-            const currentCondition = activeUnit ? activeUnit.condition : prod.condition
-            const currentPrice = activeUnit ? activeUnit.price : prod.price
-            const currentWarranty = activeUnit?.warranty || prod.warranty
-            const currentAesthetic = activeUnit?.aesthetic_grade
-            const currentBattery = activeUnit ? formatBattery(activeUnit.battery_health, activeUnit.battery_cycles) : null
+            // Grau do aparelho e Bateria da tag
+            const devQualitySlug = activeTag?.device_quality_slug || activeTag?.aesthetic_grade
+            const devQualityName = activeTag?.device_quality_name || formatAestheticGrade(devQualitySlug)
+            const isNovo = devQualitySlug === 'novo_lacrado' || prod.condition === 'novo'
+            
+            const battLabel = activeTag?.battery_quality_name || formatBattery(activeTag?.battery_health, activeTag?.battery_cycles)
+            const currentPrice = activeTag ? activeTag.price : prod.price
+            const currentWarranty = activeTag?.warranty || prod.warranty
 
-            // Mensagem precisa para o WhatsApp
+            // Link do WhatsApp com a qualidade escolhida
             let msg = ''
-            if (activeUnit) {
-              const condLabel = activeUnit.condition === 'novo' ? 'Novo Lacrado' : `Seminovo (${formatAestheticGrade(activeUnit.aesthetic_grade)})`
-              const battLabel = currentBattery ? ` com ${currentBattery}` : ''
-              const priceLabel = currentPrice ? ` por ${formatPrice(currentPrice)}` : ''
-              msg = `Olá! Vi no catálogo da LL Imports o ${prod.name} (${condLabel}), ${activeUnit.storage} na cor ${activeUnit.color}${battLabel}${priceLabel}. Gostaria de confirmar a retirada no showroom!`
+            if (activeTag) {
+              const qualityText = devQualityName ? ` (${devQualityName})` : ''
+              const batteryText = battLabel ? ` com ${battLabel}` : ''
+              const priceText = currentPrice ? ` por ${formatPrice(currentPrice)}` : ''
+              msg = `Olá! Vi no catálogo da LL Imports o ${prod.name}${qualityText}, ${activeTag.storage} na cor ${activeTag.color}${batteryText}${priceText}. Gostaria de confirmar disponibilidade no showroom!`
             } else {
               msg = `Olá! Gostaria de consultar a cotação e cores disponíveis para o ${prod.name} (${prod.condition === 'novo' ? 'Lacrado' : 'Seminovo'}).`
             }
@@ -107,10 +110,10 @@ export default function Catalog({ products: propProducts }) {
                 <div className="product-card__top">
                   <span
                     className={`product-badge ${
-                      currentCondition === 'novo' ? 'product-badge--novo' : 'product-badge--seminovo'
+                      isNovo ? 'product-badge--novo' : 'product-badge--seminovo'
                     }`}
                   >
-                    {prod.badge || (currentCondition === 'novo' ? 'Lacrado' : 'Seminovo')}
+                    {isNovo ? 'Novo Lacrado' : (devQualityName || 'Seminovo')}
                   </span>
                   <span className="product-warranty">{currentWarranty}</span>
                 </div>
@@ -131,32 +134,32 @@ export default function Catalog({ products: propProducts }) {
                 <div className="product-card__body">
                   <h3 className="product-card__name">{prod.name}</h3>
 
-                  {/* Badges de Bateria e Grau Estético */}
+                  {/* Badges de Qualidade do Aparelho & Qualidade da Bateria */}
                   <div className="product-card__meta-bar">
-                    {currentAesthetic && (
-                      <span className={`grade-badge grade-badge--${currentAesthetic}`}>
-                        ✨ {formatAestheticGrade(currentAesthetic)}
+                    {devQualitySlug && (
+                      <span className={`grade-badge grade-badge--${devQualitySlug}`}>
+                        ✨ {devQualityName}
                       </span>
                     )}
-                    {currentBattery && (
+                    {battLabel && (
                       <span
                         className={`battery-badge ${
-                          (activeUnit?.battery_health || 100) >= 90
+                          (activeTag?.battery_health || 100) >= 90
                             ? 'battery-badge--good'
                             : 'battery-badge--medium'
                         }`}
                       >
-                        🔋 {currentBattery}
+                        🔋 {battLabel}
                       </span>
                     )}
                   </div>
 
-                  {/* Tags gerais do modelo */}
+                  {/* Tags gerais ou da opção selecionada */}
                   <div className="product-card__tags">
-                    {activeUnit ? (
+                    {activeTag ? (
                       <>
-                        <span className="tag-spec">{activeUnit.storage}</span>
-                        <span className="tag-spec">{activeUnit.color}</span>
+                        <span className="tag-spec">{activeTag.storage}</span>
+                        <span className="tag-spec">{activeTag.color}</span>
                       </>
                     ) : (
                       <>
@@ -170,36 +173,37 @@ export default function Catalog({ products: propProducts }) {
                     )}
                   </div>
 
-                  {/* Seletor interativo de unidades em estoque */}
-                  {availableUnits.length > 1 && (
+                  {/* Seletor de Qualidades/Tags disponíveis */}
+                  {availableTags.length > 1 && (
                     <div className="product-card__units-box">
                       <div className="product-card__units-header">
-                        <span>Unidades Disponíveis ({availableUnits.length})</span>
+                        <span>Qualidades Disponíveis ({availableTags.length})</span>
                         <span>Selecione a opção</span>
                       </div>
                       <div className="unit-chips">
-                        {availableUnits.map((u) => {
-                          const isSelected = u.id === (activeUnit?.id)
+                        {availableTags.map((t) => {
+                          const isSelected = t.id === (activeTag?.id)
+                          const tDev = t.device_quality_name || formatAestheticGrade(t.device_quality_slug || t.aesthetic_grade)
+                          const tBatt = t.battery_quality_name || formatBattery(t.battery_health, t.battery_cycles)
                           return (
                             <button
-                              key={u.id}
+                              key={t.id}
                               type="button"
                               className={`unit-chip ${isSelected ? 'is-active' : ''}`}
                               onClick={() =>
-                                setSelectedUnits((prev) => ({ ...prev, [prod.id]: u.id }))
+                                setSelectedTags((prev) => ({ ...prev, [prod.id]: t.id }))
                               }
                             >
                               <div className="unit-chip__main">
                                 <span className="unit-chip__name">
-                                  {u.storage} · {u.color}
+                                  {t.storage} · {t.color}
                                 </span>
                                 <span className="unit-chip__sub">
-                                  {formatAestheticGrade(u.aesthetic_grade)}
-                                  {u.battery_health ? ` · 🔋 ${u.battery_health}% (${u.battery_cycles || 0}c)` : ''}
+                                  {tDev} {tBatt ? ` · 🔋 ${tBatt}` : ''}
                                 </span>
                               </div>
                               <span className="unit-chip__price">
-                                {formatPrice(u.price)}
+                                {formatPrice(t.price)}
                               </span>
                             </button>
                           )

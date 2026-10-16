@@ -20,9 +20,9 @@
       @toggle-model-active="handleToggleModelActive"
       @delete-product="handleDeleteProduct"
       @update-price="handleUpdatePrice"
-      @add-unit="handleAddUnit"
-      @toggle-unit-status="handleToggleUnitStatus"
-      @delete-unit="handleDeleteUnit"
+      @add-tag="handleAddTag"
+      @toggle-tag-availability="handleToggleTagAvailability"
+      @delete-tag="handleDeleteTag"
       @toggle-section="handleToggleSection"
     />
   </div>
@@ -55,7 +55,7 @@ const experience = computed(() => getSection(sections.value, 'experience'))
 const reviews = computed(() => getSection(sections.value, 'reviews'))
 const faq = computed(() => getSection(sections.value, 'faq'))
 
-// Mecânica 1: Modelos
+// Mecânica 1: Modelos de Aparelho
 const handleAddProduct = (newProd) => {
   products.value.unshift(newProd)
 }
@@ -76,29 +76,34 @@ const handleUpdatePrice = (id, newPrice) => {
   if (item) item.price = newPrice
 }
 
-// Mecânica 2: Unidades em Estoque
-const handleAddUnit = ({ modelId, unit }) => {
+// Mecânica 2: Tags de Qualidades Relacionais (sem controle de estoque numérico)
+const handleAddTag = ({ modelId, tag }) => {
   const item = products.value.find((p) => p.id === modelId)
   if (item) {
-    if (!item.units) item.units = []
-    item.units.unshift(unit)
+    if (!item.tags) item.tags = []
+    item.tags.unshift(tag)
+    item.units = item.tags
   }
 }
 
-const handleToggleUnitStatus = ({ modelId, unitId }) => {
+const handleToggleTagAvailability = ({ modelId, tagId }) => {
   const item = products.value.find((p) => p.id === modelId)
-  if (item && item.units) {
-    const u = item.units.find((unit) => unit.id === unitId)
-    if (u) {
-      u.status = u.status === 'disponivel' ? 'vendido' : 'disponivel'
+  if (item) {
+    const list = item.tags || item.units || []
+    const t = list.find((tag) => tag.id === tagId)
+    if (t) {
+      t.is_available = t.is_available === false ? true : false
+      t.status = t.status === 'disponivel' ? 'vendido' : 'disponivel'
     }
   }
 }
 
-const handleDeleteUnit = ({ modelId, unitId }) => {
+const handleDeleteTag = ({ modelId, tagId }) => {
   const item = products.value.find((p) => p.id === modelId)
-  if (item && item.units) {
-    item.units = item.units.filter((unit) => unit.id !== unitId)
+  if (item) {
+    const list = item.tags || item.units || []
+    item.tags = list.filter((tag) => tag.id !== tagId)
+    item.units = item.tags
   }
 }
 

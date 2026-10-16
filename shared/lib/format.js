@@ -47,8 +47,9 @@ export function formatAestheticGrade(grade) {
       return 'Excelente (Grade A+)';
     case 'muito_bom':
       return 'Muito Bom (Grade A)';
+    case 'usado':
     case 'bom_usado':
-      return 'Bom / Usado (Grade B)';
+      return 'Usado (Grade B)';
     default:
       return grade || 'Excelente';
   }
