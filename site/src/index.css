@@ -1,0 +1,165 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+:root {
+  --bg: #ffffff;
+  --fg: #000000;
+  --fg-soft: #1a1a1a;
+  --muted: #5c5c5c;
+  --subtle: #9e9e9e;
+  --surface: #f4f4f4;
+  --surface-2: #eaeaea;
+  --ph: #e2e2e2;
+  --ph-fig: #cfcfcf;
+  --ph-dark: #5c5c5c;
+  --line: #eaeaea;
+  --inv-bg: #000000;
+  --inv-fg: #ffffff;
+  --inv-muted: #bdbdbd;
+  --btn-bg: #000000;
+  --btn-fg: #ffffff;
+  --field-border: #dedede;
+  --club-glow: rgb(255 255 255 / 0.28);
+  --shadow-float: 0 8px 30px rgb(0 0 0 / 0.08);
+  --shadow-card: 0 18px 40px rgb(0 0 0 / 0.1);
+}
+
+[data-theme='dark'] {
+  --bg: #161616;
+  --fg: #f5f5f5;
+  --fg-soft: #f5f5f5;
+  --muted: #8c8c8c;
+  --subtle: #4a4a4a;
+  --surface: #1f1f1f;
+  --surface-2: #2b2b2b;
+  --ph: #262626;
+  --ph-fig: #3a3a3a;
+  --ph-dark: #8c8c8c;
+  --line: #2b2b2b;
+  --inv-bg: #f4f4f4;
+  --inv-fg: #1a1a1a;
+  --inv-muted: #5c5c5c;
+  --btn-bg: #f5f5f5;
+  --btn-fg: #050505;
+  --field-border: #2b2b2b;
+  --club-glow: rgb(0 0 0 / 0.9);
+  --shadow-float: 0 8px 30px rgb(0 0 0 / 0.5);
+  --shadow-card: 0 18px 40px rgb(0 0 0 / 0.5);
+}
+
+@theme inline {
+  --font-sans: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  --font-ui: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --color-bg: var(--bg);
+  --color-fg: var(--fg);
+  --color-fg-soft: var(--fg-soft);
+  --color-muted: var(--muted);
+  --color-subtle: var(--subtle);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ph: var(--ph);
+  --color-line: var(--line);
+  --color-inv-bg: var(--inv-bg);
+  --color-inv-fg: var(--inv-fg);
+  --color-inv-muted: var(--inv-muted);
+  --color-btn-bg: var(--btn-bg);
+  --color-btn-fg: var(--btn-fg);
+  --color-field: var(--field-border);
+}
+
+html {
+  scroll-behavior: smooth;
+  background: var(--bg);
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+section[id] {
+  scroll-margin-top: 96px;
+}
+
+.container-ll {
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: 20px;
+}
+
+@media (min-width: 1280px) {
+  .container-ll {
+    padding-inline: 0;
+  }
+}
+
+.h-display {
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+@keyframes marquee-up {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-50%);
+  }
+}
+
+/* Palavra rotativa do título do hero */
+.rotator {
+  position: relative;
+  display: inline-grid;
+  vertical-align: bottom;
+  /* a trilha acompanha a largura do contêiner (a palavra ativa), não a da palavra mais larga */
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: start;
+  transition: width 380ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.rotator__word {
+  grid-area: 1 / 1;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(55%);
+  filter: blur(10px);
+  transition:
+    opacity 600ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 700ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.rotator__word.is-active {
+  opacity: 1;
+  transform: none;
+  filter: blur(0);
+  /* entra um pouco depois, quando a caixa já alargou e a palavra anterior saiu */
+  transition-delay: 300ms;
+}
+
+.rotator__word.is-leaving {
+  opacity: 0;
+  transform: translateY(-55%);
+  filter: blur(10px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rotator,
+  .rotator__word {
+    transition: none;
+  }
+}
