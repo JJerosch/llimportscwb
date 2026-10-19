@@ -13,7 +13,7 @@ export type ProductKind = 'iphone' | 'mac' | 'ipad' | 'watch' | 'acessorios'
 // Os rótulos são os nomes das seções da landing; o href aponta para o id da seção.
 export const navLinks = [
   { label: 'Categorias', href: '/#categorias' },
-  { label: 'iPhones', href: '/#lancamentos' },
+  { label: 'Produtos', href: '/#lancamentos' },
   { label: 'Experiência', href: '/#por-que' },
   { label: 'Avaliações', href: '/#avaliacoes' },
   { label: 'Clube', href: '/#clube' },
@@ -21,20 +21,122 @@ export const navLinks = [
   { label: 'Catálogo', href: '/catalogo' },
 ]
 
-export const categories: { kind: ProductKind; label: string; description: string; productId: number }[] = [
-  { kind: 'iphone', label: 'iPhone', description: 'Do iPhone 11 ao 17 Pro Max, lacrados e com nota fiscal.', productId: 3372 },
-  { kind: 'mac', label: 'Mac', description: 'MacBook Air, MacBook Pro e Mac mini com chips da linha M.', productId: 2735 },
-  { kind: 'ipad', label: 'iPad', description: 'Para estudar, desenhar e trabalhar de qualquer lugar.', productId: 2682 },
-  { kind: 'watch', label: 'Apple Watch', description: 'Treino, saúde e notificações direto no pulso.', productId: 2716 },
-  { kind: 'acessorios', label: 'Acessórios', description: 'Capinhas, carregadores, AirPods e o que mais faltar.', productId: 2739 },
+/** Ficha do produto em destaque de cada categoria (cores, opções e especificações principais). */
+export type FeaturedSpecs = {
+  colors: { name: string; hex: string }[]
+  options: { label: string; values: string[] }
+  details: { label: string; value: string }[]
+}
+
+export const categories: {
+  kind: ProductKind
+  label: string
+  description: string
+  productId: number
+  specs: FeaturedSpecs
+}[] = [
+  {
+    kind: 'iphone',
+    label: 'iPhone',
+    description: 'Do iPhone 11 ao 17 Pro Max, lacrados e com nota fiscal.',
+    productId: 3372,
+    specs: {
+      colors: [
+        { name: 'Laranja-cósmico', hex: '#e2783a' },
+        { name: 'Azul-intenso', hex: '#323e55' },
+        { name: 'Prateado', hex: '#e3e3e1' },
+      ],
+      options: { label: 'Armazenamento', values: ['256 GB', '512 GB', '1 TB', '2 TB'] },
+      details: [
+        { label: 'Tela', value: '6,9″ ProMotion 120 Hz' },
+        { label: 'Chip', value: 'A19 Pro' },
+        { label: 'Câmeras', value: '3 de 48 MP, zoom óptico 8x' },
+        { label: 'Frontal', value: '18 MP Center Stage' },
+      ],
+    },
+  },
+  {
+    kind: 'mac',
+    label: 'Mac',
+    description: 'MacBook Air, MacBook Pro e Mac mini com chips da linha M.',
+    productId: 2735,
+    specs: {
+      colors: [{ name: 'Prateado', hex: '#d9d9db' }],
+      options: { label: 'Armazenamento', values: ['256 GB', '512 GB', '1 TB'] },
+      details: [
+        { label: 'Chip', value: 'M4, CPU e GPU de 10 núcleos' },
+        { label: 'Memória', value: '16 GB unificada' },
+        { label: 'Portas', value: '3 Thunderbolt 4, HDMI, 2 USB-C' },
+        { label: 'Telas', value: 'Até 3 monitores externos' },
+      ],
+    },
+  },
+  {
+    kind: 'ipad',
+    label: 'iPad',
+    description: 'Para estudar, desenhar e trabalhar de qualquer lugar.',
+    productId: 2682,
+    specs: {
+      colors: [
+        { name: 'Preto-espacial', hex: '#3b3b3d' },
+        { name: 'Prateado', hex: '#e3e4e5' },
+      ],
+      options: { label: 'Armazenamento', values: ['256 GB', '512 GB', '1 TB', '2 TB'] },
+      details: [
+        { label: 'Tela', value: '11″ Ultra Retina XDR (OLED)' },
+        { label: 'Chip', value: 'M5' },
+        { label: 'Câmera', value: '12 MP traseira + frontal 12 MP' },
+        { label: 'Compatível', value: 'Apple Pencil Pro' },
+      ],
+    },
+  },
+  {
+    kind: 'watch',
+    label: 'Apple Watch',
+    description: 'Treino, saúde e notificações direto no pulso.',
+    productId: 2716,
+    specs: {
+      colors: [
+        { name: 'Titânio natural', hex: '#c9c2b6' },
+        { name: 'Titânio preto', hex: '#2e2d2c' },
+      ],
+      options: { label: 'Tamanho', values: ['49 mm'] },
+      details: [
+        { label: 'Tela', value: 'OLED grande-angular, 3000 nits' },
+        { label: 'Bateria', value: 'Até 42 h (72 h econ.)' },
+        { label: 'Conexão', value: 'GPS + celular 5G e satélite' },
+        { label: 'Resistência', value: 'Água até 100 m' },
+      ],
+    },
+  },
+  {
+    kind: 'acessorios',
+    label: 'Acessórios',
+    description: 'Capinhas, carregadores, AirPods e o que mais faltar.',
+    productId: 2739,
+    specs: {
+      colors: [{ name: 'Branco', hex: '#f5f5f3' }],
+      options: { label: 'Versões', values: ['AirPods 4', 'Com cancelamento de ruído'] },
+      details: [
+        { label: 'Chip', value: 'H2' },
+        { label: 'Áudio', value: 'Espacial personalizado' },
+        { label: 'Bateria', value: 'Até 30 h com o estojo' },
+        { label: 'Estojo', value: 'USB-C, resistente a poeira e água' },
+      ],
+    },
+  },
 ]
 
-// Cards de iPhone da landing: o productId liga cada um ao produto do catálogo (foto e nome completo).
-export const launches = [
-  { productId: 3372, name: 'iPhone 17 Pro Max', chips: ['Tela de 6,9″', '3 câmeras de 48 MP'] },
-  { productId: 629, name: 'iPhone 17 Pro', chips: ['Tela de 6,3″', '3 câmeras de 48 MP'] },
-  { productId: 325, name: 'iPhone 17', chips: ['Tela de 6,3″', 'ProMotion'] },
-  { productId: 106, name: 'iPhone Air', chips: ['Tela de 6,5″', '5,6 mm de espessura'] },
+// Cards de "Produtos disponíveis" da landing: o productId liga cada um ao produto do catálogo (foto e nome completo).
+export const launches: { productId: number; name: string; kind: ProductKind; chips: string[] }[] = [
+  { productId: 3372, name: 'iPhone 17 Pro Max', kind: 'iphone', chips: ['Tela de 6,9″', '3 câmeras de 48 MP'] },
+  { productId: 629, name: 'iPhone 17 Pro', kind: 'iphone', chips: ['Tela de 6,3″', '3 câmeras de 48 MP'] },
+  { productId: 325, name: 'iPhone 17', kind: 'iphone', chips: ['Tela de 6,3″', 'ProMotion'] },
+  { productId: 106, name: 'iPhone Air', kind: 'iphone', chips: ['Tela de 6,5″', '5,6 mm de espessura'] },
+  { productId: 2735, name: 'Mac mini', kind: 'mac', chips: ['Chip M4', '16 GB + 256 GB'] },
+  { productId: 2682, name: 'iPad Pro 11″', kind: 'ipad', chips: ['Chip M5', '256 GB'] },
+  { productId: 2716, name: 'Apple Watch Ultra 3', kind: 'watch', chips: ['49 mm', 'Titânio'] },
+  { productId: 2739, name: 'AirPods 4', kind: 'acessorios', chips: ['Chip H2', 'USB-C'] },
 ]
 
 // Textos clonados de llimportscwb.com.br ("Sua experiência Apple, elevada a um novo nível").
