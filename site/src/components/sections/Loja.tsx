@@ -1,7 +1,8 @@
 import { MapPin, MessageCircle } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Button } from '../Button'
-import { INSTAGRAM_URL, MAP_URL, whatsappLink } from '../../lib/content'
+import { PhotoCarousel } from '../ui/photo-carousel'
+import { INSTAGRAM_URL, MAP_EMBED_URL, MAP_URL, whatsappLink } from '../../lib/content'
 
 function InstagramIcon() {
   return (
@@ -65,20 +66,23 @@ export function Loja() {
           </div>
         </div>
 
-        <a
-          href={MAP_URL}
-          target="_blank"
-          rel="noreferrer"
-          aria-label="Abrir a localização da LL Imports no mapa"
-          className="grid h-[300px] place-items-center rounded-[32px] bg-ph transition hover:opacity-90 md:h-[420px]"
-        >
-          <span className="flex flex-col items-center gap-3 text-center">
-            <span className="grid size-14 place-items-center rounded-full bg-btn-bg text-btn-fg">
-              <MapPin size={24} strokeWidth={1.75} />
-            </span>
-            <span className="font-ui text-[13px] font-medium">LL Imports, Cabral, Curitiba</span>
-          </span>
-        </a>
+        {/* Coluna da direita: fotos ocupam ~60% da altura e o mapa ~40%. */}
+        <div className="grid h-[460px] grid-rows-[3fr_2fr] gap-4 md:h-[520px]">
+          <PhotoCarousel
+            photos={[
+              { src: '/media/escritorio-1.jpg', alt: 'Interior da LL Imports em Curitiba' },
+              { src: '/media/escritorio-2.jpg', alt: 'Espaço de atendimento da LL Imports' },
+            ]}
+            className="h-full"
+          />
+          <iframe
+            src={MAP_EMBED_URL}
+            title="Localização da LL Imports no mapa"
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            className="h-full w-full rounded-[32px] border-0"
+          />
+        </div>
       </div>
     </section>
   )

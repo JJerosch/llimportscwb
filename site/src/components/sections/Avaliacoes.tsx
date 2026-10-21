@@ -13,7 +13,9 @@ function ReviewCard({ text, author }: (typeof reviews)[number]) {
       </div>
       <p className="mt-4 line-clamp-4 text-[15px] leading-relaxed">{text}</p>
       <footer className="mt-5 flex items-center gap-3">
-        <span className="size-9 rounded-full bg-surface-2" aria-hidden />
+        <span className="grid size-9 place-items-center rounded-full bg-surface-2 font-ui text-sm font-medium" aria-hidden>
+          {author[0]}
+        </span>
         <span className="leading-tight">
           <span className="block font-ui text-[13px] font-medium">{author}</span>
           <span className="block font-ui text-xs text-muted">Avaliação no Google</span>

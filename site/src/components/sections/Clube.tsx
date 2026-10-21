@@ -1,6 +1,13 @@
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, Gem, MessageCircle, Rocket, ShieldCheck } from 'lucide-react'
 import { useId, useState, type FormEvent } from 'react'
 import { interests } from '../../lib/content'
+
+const benefits = [
+  { icon: Rocket, title: 'Lançamentos', text: 'Avisos antes de ir pro Instagram.' },
+  { icon: Gem, title: 'Ofertas Únicas', text: 'Preços especiais para inscritos.' },
+  { icon: MessageCircle, title: 'Atendimento', text: 'Consultoria VIP pelo WhatsApp.' },
+  { icon: ShieldCheck, title: 'Zero Spam', text: 'Apenas o produto do seu interesse.' },
+]
 
 const field =
   'h-[52px] w-full rounded-2xl border border-field bg-transparent px-4 font-ui text-[15px] text-fg outline-none transition placeholder:text-subtle focus:border-fg'
@@ -47,9 +54,18 @@ export function Clube() {
             <div>
               <h2 className="h-display text-[38px] md:text-[52px]">Entre para o Clube LLimportsCWB</h2>
               <p className="mt-6 max-w-[430px] text-base leading-relaxed text-inv-muted">
-                Seja o primeiro a saber dos lançamentos, receba ofertas exclusivas e tenha acesso a condições
-                especiais. Cadastre seu e-mail e faça parte da nossa comunidade de apaixonados por Apple.
+                Seja o primeiro a saber dos lançamentos e tenha acesso a condições especiais.
               </p>
+
+              <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {benefits.map(({ icon: Icon, title, text }) => (
+                  <div key={title} className="rounded-[24px] border border-current/15 bg-current/[0.04] p-5">
+                    <Icon size={22} strokeWidth={1.75} />
+                    <h3 className="mt-4 font-ui text-[15px] font-medium">{title}</h3>
+                    <p className="mt-1 font-ui text-[13px] leading-relaxed text-inv-muted">{text}</p>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className="rounded-[28px] bg-bg p-6 text-fg md:p-8">

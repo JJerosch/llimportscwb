@@ -2,7 +2,9 @@ export const WHATSAPP_NUMBER = '554132275066'
 export const INSTAGRAM_URL = 'https://instagram.com/llimportscwb'
 export const MAP_URL =
   'https://www.google.com/maps/search/?api=1&query=Rua+Anita+Garibaldi+850+Cabral+Curitiba'
-export const GOOGLE_REVIEWS_URL = 'https://www.google.com/maps/search/?api=1&query=LL+Imports+Curitiba'
+export const MAP_EMBED_URL =
+  'https://www.google.com/maps?q=Rua+Anita+Garibaldi+850+Cabral+Curitiba&output=embed'
+export const GOOGLE_REVIEWS_URL ='https://www.google.com/maps/search/?api=1&query=LL+Imports+Curitiba'
 
 export function whatsappLink(message: string) {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`
@@ -153,12 +155,16 @@ export const whyItems = [
 ] as const
 
 export const reviews = [
-  { text: 'Espaço para uma avaliação curta do Google.', author: 'Cliente do Google' },
-  { text: 'Espaço para uma avaliação mais longa. O texto é puxado automaticamente do Google e corta depois de quatro linhas para manter o ritmo das colunas.', author: 'Cliente do Google' },
-  { text: 'Espaço para uma avaliação do Google sobre o atendimento.', author: 'Cliente do Google' },
-  { text: 'Espaço para uma avaliação média vinda do Google.', author: 'Cliente do Google' },
-  { text: 'Espaço para uma avaliação curta do Google.', author: 'Cliente do Google' },
-  { text: 'Espaço para uma avaliação do Google sobre a entrega.', author: 'Cliente do Google' },
+  { text: 'Atendimento excelente! Comprei celular hoje com eles e foi tudo ótimo. Recomendo!', author: 'R. S.' },
+  { text: 'O atendimento é incrível e os produtos são mesmo originais. Os preços são sempre imbatíveis! Compraria novamente aqui e sempre indico pra todo mundo!', author: 'Natalia Rocha' },
+  { text: 'Super indico a loja! Tudo original e no precinho, além da Lene ser super gentil e atenciosa! Só comprem!!!!', author: 'Luana Lewis' },
+  { text: 'Muito bem atendido via Instagram, agendamento pra ver o aparelho foi bem rápido. iPhone 13 PRO em excelente estado com Garantia de 1 ano, atendimento na loja excelente, testam tudo mesmo na sua frente. Ainda ganhei uma incrível embalagem de presente feita por eles. Vou voltar e indicar com certeza.', author: 'Isaias Garcez' },
+  { text: 'Atendimento muito bom e prestativo desde pesquisa a pós venda.', author: 'João Avelino' },
+  { text: 'Toda a equipe da loja foi muito atenciosa, em especial os donos. O celular que compramos estava impecável e com garantia! Recomendo!', author: 'Ferrarini Luciana' },
+  { text: 'Ótima experiência de compra! Produtos Apple originais e com preços justos. Atendimento atencioso e entrega rápida. Recomendo com confiança! Fiz o primeiro contato pelo insta, conversamos e no mesmo dia pude retirar o produto! Com certeza comprarei mais itens da loja!', author: 'Isabella Andrade' },
+  { text: 'Fui até a loja por indicação de duas amigas e não me arrependi! Atendimento personalizado e encontramos o modelo de celular perfeito funcionando bem! Oferecem acessórios também! Recomendo!', author: 'Rita Pacheco' },
+  { text: 'Atendimento e preço muito bons, consegui tirar todas as minhas dúvidas via Instagram e comprei com eles meu MacBook na loja deles presencial, acabei comprando já o Hub e adaptador do carregador para o padrão brasileiro uma vez que eles tem uma variedade muito boa de itens na loja deles.', author: 'Cosme Lorim' },
+  { text: 'Gostaria de agradecer pelo excelente atendimento que recebi nesse final de semana. Agradeço de verdade pela paciência em esclarecer todas as minhas dúvidas e por respeitarem meu tempo para decidir com calma.', author: 'Henrique Sokoloski Rodrigues' },
 ]
 
 export const faqs = [

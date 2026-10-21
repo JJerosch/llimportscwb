@@ -6,11 +6,48 @@ import { whyItems } from '../../lib/content'
 
 const icons = { message: MessageCircle, lock: Lock, star: Star, calendar: CalendarDays, pin: MapPin }
 
+// Foto de fundo de cada card, na mesma ordem de whyItems.
+const photos = [
+  '/media/experiencia/atendimento-exclusivo.png',
+  '/media/experiencia/seguranca-total.jpeg',
+  '/media/experiencia/pos-venda.png',
+  '/media/experiencia/confianca-garantida.jpg',
+  '/media/experiencia/agilidade-novidade.png',
+]
+
 // Mesma curva para o card alargar e o texto subir/descer, para tudo andar junto.
 const ease = { duration: 0.6, ease: [0.22, 1, 0.36, 1] } as const
 const OPEN_GROW = 2.65
 const GAP = 16
 const PADDING = 56
+
+/**
+ * Foto do card: ao abrir, ela entra desfocada e nítida por cima da cor de fundo;
+ * ao fechar, desfoca e some, revelando a cor do tema do card.
+ */
+function CardPhoto({ src, isOpen }: { src: string; isOpen: boolean }) {
+  return (
+    <motion.div
+      aria-hidden
+      initial={false}
+      animate={{ opacity: isOpen ? 1 : 0 }}
+      transition={ease}
+      className="pointer-events-none absolute inset-0 -z-10 overflow-hidden rounded-[inherit]"
+    >
+      <motion.img
+        src={src}
+        alt=""
+        draggable={false}
+        initial={false}
+        animate={{ filter: isOpen ? 'blur(0px)' : 'blur(24px)', scale: isOpen ? 1 : 1.12 }}
+        transition={ease}
+        className="size-full object-cover object-top"
+      />
+      <div className="absolute inset-0 bg-black/50" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+    </motion.div>
+  )
+}
 
 /**
  * Largura útil dos cards aberto e fechado. O texto já recebe a largura final no início da transição,
@@ -55,6 +92,12 @@ export function PorQueLL() {
   const [open, setOpen] = useState(0)
   const [rowRef, widths] = useTextWidths(whyItems.length)
 
+  // Passa sozinho para o próximo card a cada 5s. Qualquer troca (hover, toque) reinicia a contagem.
+  useEffect(() => {
+    const id = setInterval(() => setOpen((o) => (o + 1) % whyItems.length), 5000)
+    return () => clearInterval(id)
+  }, [open])
+
   return (
     <section id="por-que" className="py-[72px] md:py-[96px]">
       <div className="container-ll">
@@ -81,10 +124,11 @@ export function PorQueLL() {
                 animate={{ flexGrow: isOpen ? OPEN_GROW : 1 }}
                 transition={ease}
                 className={cn(
-                  'flex min-w-0 basis-0 flex-col justify-between overflow-hidden rounded-[32px] p-7 transition-colors duration-500 outline-none',
-                  isOpen ? 'bg-inv-bg text-inv-fg' : 'bg-surface text-fg',
+                  'isolate relative flex min-w-0 basis-0 flex-col justify-between overflow-hidden rounded-[32px] p-7 transition-colors duration-500 outline-none',
+                  isOpen ? 'bg-black text-white' : 'bg-surface text-fg',
                 )}
               >
+                <CardPhoto src={photos[i]} isOpen={isOpen} />
                 <Icon size={24} strokeWidth={1.75} fill={item.icon === 'star' ? 'currentColor' : 'none'} />
                 {/* Fechado: só o título, encostado embaixo. Aberto: a descrição cresce e empurra o título para cima. */}
                 <div>
@@ -100,7 +144,7 @@ export function PorQueLL() {
                       animate={{ opacity: isOpen ? 1 : 0, y: isOpen ? 0 : 12 }}
                       transition={isOpen ? { ...ease, delay: 0.12 } : { duration: 0.2 }}
                       style={widths.open ? { width: widths.open } : undefined}
-                      className="pt-3 text-base leading-relaxed text-inv-muted"
+                      className="pt-3 text-base leading-relaxed text-white/80"
                     >
                       {item.text}
                     </motion.p>
@@ -123,16 +167,17 @@ export function PorQueLL() {
                 aria-expanded={isOpen}
                 onClick={() => setOpen(isOpen ? -1 : i)}
                 className={cn(
-                  'rounded-[28px] p-5 text-left transition-colors',
-                  isOpen ? 'bg-inv-bg text-inv-fg' : 'bg-surface text-fg',
+                  'isolate relative overflow-hidden rounded-[28px] p-5 text-left transition-colors duration-500',
+                  isOpen ? 'bg-black text-white' : 'bg-surface text-fg',
                 )}
               >
+                <CardPhoto src={photos[i]} isOpen={isOpen} />
                 <span className="flex items-center gap-4">
                   <Icon size={22} strokeWidth={1.75} fill={item.icon === 'star' ? 'currentColor' : 'none'} />
                   <span className="flex-1 text-lg font-medium tracking-tight">{item.title}</span>
                   {isOpen ? <Minus size={20} strokeWidth={1.75} /> : <Plus size={20} strokeWidth={1.75} />}
                 </span>
-                {isOpen && <span className="mt-3 block pl-[38px] text-[15px] leading-relaxed text-inv-muted">{item.text}</span>}
+                {isOpen && <span className="mt-3 block pl-[38px] text-[15px] leading-relaxed text-white/80">{item.text}</span>}
               </button>
             )
           })}
