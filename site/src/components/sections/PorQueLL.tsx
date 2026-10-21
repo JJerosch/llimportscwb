@@ -1,13 +1,59 @@
 import { motion } from 'motion/react'
 import { CalendarDays, Lock, MapPin, MessageCircle, Plus, Minus, Star } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { cn } from '../../lib/cn'
 import { whyItems } from '../../lib/content'
 
 const icons = { message: MessageCircle, lock: Lock, star: Star, calendar: CalendarDays, pin: MapPin }
 
+// Mesma curva para o card alargar e o texto subir/descer, para tudo andar junto.
+const ease = { duration: 0.6, ease: [0.22, 1, 0.36, 1] } as const
+const OPEN_GROW = 2.65
+const GAP = 16
+const PADDING = 56
+
+/**
+ * Largura útil dos cards aberto e fechado. O texto já recebe a largura final no início da transição,
+ * assim a quebra de linha acontece num render (que o motion consegue animar) e não no meio do caminho.
+ */
+function useTextWidths(count: number) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [widths, setWidths] = useState({ open: 0, closed: 0 })
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const ro = new ResizeObserver(([entry]) => {
+      const unit = (entry.contentRect.width - GAP * (count - 1)) / (OPEN_GROW + count - 1)
+      setWidths({ open: Math.max(0, unit * OPEN_GROW - PADDING), closed: Math.max(0, unit - PADDING) })
+    })
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [count])
+  return [ref, widths] as const
+}
+
+/** Título palavra por palavra: quando uma palavra muda de linha (ou de tamanho), ela desliza até o novo lugar. */
+function FloatingTitle({ text, isOpen, width }: { text: string; isOpen: boolean; width: number }) {
+  return (
+    <h3
+      style={width ? { width } : undefined}
+      className={cn('font-medium tracking-tight', isOpen ? 'text-[28px] leading-[1.2]' : 'text-[19px] leading-[1.35]')}
+    >
+      {text.split(' ').map((word, i) => (
+        <span key={i}>
+          {i > 0 && ' '}
+          <motion.span layout transition={ease} className="inline-block origin-bottom-left">
+            {word}
+          </motion.span>
+        </span>
+      ))}
+    </h3>
+  )
+}
+
 export function PorQueLL() {
   const [open, setOpen] = useState(0)
+  const [rowRef, widths] = useTextWidths(whyItems.length)
 
   return (
     <section id="por-que" className="py-[72px] md:py-[96px]">
@@ -22,7 +68,7 @@ export function PorQueLL() {
         </div>
 
         {/* Desktop: cards lado a lado; o card sob o mouse se expande. */}
-        <div className="hidden h-[380px] gap-4 md:flex">
+        <div ref={rowRef} className="hidden h-[380px] gap-4 md:flex">
           {whyItems.map((item, i) => {
             const Icon = icons[item.icon]
             const isOpen = open === i
@@ -32,25 +78,33 @@ export function PorQueLL() {
                 onHoverStart={() => setOpen(i)}
                 onFocus={() => setOpen(i)}
                 tabIndex={0}
-                animate={{ flexGrow: isOpen ? 2.65 : 1 }}
-                transition={{ type: 'spring', stiffness: 220, damping: 30 }}
+                animate={{ flexGrow: isOpen ? OPEN_GROW : 1 }}
+                transition={ease}
                 className={cn(
-                  'flex min-w-0 basis-0 flex-col justify-between overflow-hidden rounded-[32px] p-7 outline-none',
+                  'flex min-w-0 basis-0 flex-col justify-between overflow-hidden rounded-[32px] p-7 transition-colors duration-500 outline-none',
                   isOpen ? 'bg-inv-bg text-inv-fg' : 'bg-surface text-fg',
                 )}
               >
                 <Icon size={24} strokeWidth={1.75} fill={item.icon === 'star' ? 'currentColor' : 'none'} />
+                {/* Fechado: só o título, encostado embaixo. Aberto: a descrição cresce e empurra o título para cima. */}
                 <div>
-                  <h3 className={cn('font-medium tracking-tight', isOpen ? 'text-[28px]' : 'text-[19px] leading-snug')}>
-                    {item.title}
-                  </h3>
-                  <motion.p
+                  <FloatingTitle text={item.title} isOpen={isOpen} width={isOpen ? widths.open : widths.closed} />
+                  <motion.div
                     initial={false}
-                    animate={{ opacity: isOpen ? 1 : 0, height: isOpen ? 'auto' : 0 }}
-                    className="overflow-hidden text-base leading-relaxed text-inv-muted"
+                    animate={{ height: isOpen ? 'auto' : 0 }}
+                    transition={ease}
+                    className="overflow-hidden"
                   >
-                    <span className="mt-3 block">{item.text}</span>
-                  </motion.p>
+                    <motion.p
+                      initial={false}
+                      animate={{ opacity: isOpen ? 1 : 0, y: isOpen ? 0 : 12 }}
+                      transition={isOpen ? { ...ease, delay: 0.12 } : { duration: 0.2 }}
+                      style={widths.open ? { width: widths.open } : undefined}
+                      className="pt-3 text-base leading-relaxed text-inv-muted"
+                    >
+                      {item.text}
+                    </motion.p>
+                  </motion.div>
                 </div>
               </motion.div>
             )
